@@ -4908,6 +4908,84 @@
 .illustration--action-toolbar .es12-pop { transform-box: fill-box; transform-origin: center; animation: es12-pop 3.4s infinite; }
 .illustration--action-toolbar .es12-pop-2 { animation-delay: -1.7s; }
 
+/* ── ai-burst (es14) ── */
+@keyframes es14core { from { transform: scale(1); } to { transform: scale(1.04); } }
+@keyframes es14twinkle { from { opacity: 1; transform: scale(1); } to { opacity: .65; transform: scale(.97); } }
+@keyframes es14ring { from { opacity: 1; } to { opacity: .45; } }
+@keyframes es14orb { from { transform: translateY(-2.5px); } to { transform: translateY(2.5px); } }
+.illustration--ai-burst .core,
+.illustration--ai-burst .spk { transform-box: fill-box; transform-origin: center; }
+.illustration--ai-burst .core { animation: es14core 1.7s cubic-bezier(.45, 0, .55, 1) infinite alternate; }
+.illustration--ai-burst .spk { animation: es14twinkle 1.6s cubic-bezier(.45, 0, .55, 1) infinite alternate; animation-delay: -.5s; }
+.illustration--ai-burst .h1,
+.illustration--ai-burst .h2 { animation: es14ring 2.4s cubic-bezier(.45, 0, .55, 1) infinite alternate; }
+.illustration--ai-burst .h2 { animation-delay: -1.2s; }
+.illustration--ai-burst .cTL,
+.illustration--ai-burst .cTR,
+.illustration--ai-burst .cBL,
+.illustration--ai-burst .cBR { animation: es14orb 2.2s cubic-bezier(.45, 0, .55, 1) infinite alternate; }
+.illustration--ai-burst .cTR { animation-delay: -.4s; }
+.illustration--ai-burst .cBL { animation-delay: -.8s; }
+.illustration--ai-burst .cBR { animation-delay: -1.2s; }
+
+/* ── knowledge-graph (es15) ── */
+@keyframes es15twinkle { from { opacity: 1; transform: scale(1); } to { opacity: .65; transform: scale(.97); } }
+@keyframes es15drift { from { transform: translate(-2px, 1.6px) rotate(-.7deg); } to { transform: translate(2px, -1.6px) rotate(.7deg); } }
+@keyframes es15glow { from { opacity: 0; } to { opacity: .45; } }
+.illustration--knowledge-graph .spk { transform-box: fill-box; transform-origin: center; animation: es15twinkle 1.6s cubic-bezier(.45, 0, .55, 1) infinite alternate; animation-delay: -.5s; }
+.illustration--knowledge-graph .es15-drift { transform-box: view-box; transform-origin: 128px 128px; animation: es15drift 4.4s cubic-bezier(.45, 0, .55, 1) infinite alternate; }
+.illustration--knowledge-graph .es15-sweep { animation: es15glow 2.6s cubic-bezier(.45, 0, .55, 1) infinite alternate; }
+
+/* ── ai-chat (es16) ── */
+@keyframes es16in { 0% { opacity: 0; transform: translateY(4px); animation-timing-function: cubic-bezier(.23, 1, .32, 1); } 11% { opacity: 1; transform: translateY(0); animation-timing-function: linear; } 78% { opacity: 1; transform: translateY(0); animation-timing-function: cubic-bezier(.4, 0, .7, 1); } 93%, 100% { opacity: 0; transform: translateY(-3px); } }
+@keyframes es16twinkle { from { opacity: 1; transform: scale(1); } to { opacity: .65; transform: scale(.97); } }
+@keyframes es16float { from { transform: translateY(-2.5px); } to { transform: translateY(2.5px); } }
+.illustration--ai-chat .b1,
+.illustration--ai-chat .b2,
+.illustration--ai-chat .b3 { animation: es16in 5.4s infinite; }
+.illustration--ai-chat .b2 { animation-delay: .45s; }
+.illustration--ai-chat .b3 { animation-delay: .9s; }
+.illustration--ai-chat .spk { transform-box: fill-box; transform-origin: center; animation: es16twinkle 1.6s cubic-bezier(.45, 0, .55, 1) infinite alternate; }
+.illustration--ai-chat .spk2 { animation-delay: -.5s; }
+.illustration--ai-chat .spk3 { animation-delay: -1s; }
+.illustration--ai-chat .dot { animation: es16float 2.2s cubic-bezier(.45, 0, .55, 1) infinite alternate; }
+.illustration--ai-chat .dot2 { animation-delay: -.8s; }
+
+/* ── ai-workflow (es17) ── */
+@keyframes es17spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes es17twinkle { from { opacity: 1; transform: scale(1); } to { opacity: .65; transform: scale(.97); } }
+@keyframes es17pulse { from { opacity: 1; } to { opacity: .9; } }
+@keyframes es17-glow { from { opacity: 0; } to { opacity: .5; } }
+.illustration--ai-workflow .gear,
+.illustration--ai-workflow .spk { transform-box: fill-box; transform-origin: center; }
+.illustration--ai-workflow .gear { animation: es17spin 8s linear infinite; }
+.illustration--ai-workflow .spk { animation: es17twinkle 1.6s cubic-bezier(.45, 0, .55, 1) infinite alternate; animation-delay: -.5s; }
+.illustration--ai-workflow .pA,
+.illustration--ai-workflow .pB,
+.illustration--ai-workflow .pC { animation: es17pulse 1.7s cubic-bezier(.45, 0, .55, 1) infinite alternate; }
+.illustration--ai-workflow .pB { animation-delay: -.55s; }
+.illustration--ai-workflow .pC { animation-delay: -1.1s; }
+.illustration--ai-workflow .es17-sweep-a,
+.illustration--ai-workflow .es17-sweep-b,
+.illustration--ai-workflow .es17-shim-1,
+.illustration--ai-workflow .es17-shim-2,
+.illustration--ai-workflow .es17-shim-3 { animation: es17-glow 2.6s cubic-bezier(.45, 0, .55, 1) infinite alternate; }
+.illustration--ai-workflow .es17-sweep-b { animation-delay: -.8s; }
+.illustration--ai-workflow .es17-shim-2 { animation-delay: -.5s; }
+.illustration--ai-workflow .es17-shim-3 { animation-delay: -1s; }
+
+/* ── ai-prompt (es18) ── */
+@keyframes es18-float { from { transform: translateY(-3px); } to { transform: translateY(3px); } }
+@keyframes es18-twinkle { from { opacity: 1; transform: scale(1); } to { opacity: .65; transform: scale(.97); } }
+@keyframes es18-glow { from { opacity: 0; } to { opacity: .3; } }
+@keyframes es18-pop { 0% { transform: scale(1); animation-timing-function: cubic-bezier(.23, 1, .32, 1); } 5% { transform: scale(1.05); animation-timing-function: cubic-bezier(.45, 0, .55, 1); } 18%, 100% { transform: scale(1); } }
+.illustration--ai-prompt .es18-chip { transform-box: fill-box; transform-origin: center; animation: es18-float 2.4s cubic-bezier(.45, 0, .55, 1) infinite alternate; }
+.illustration--ai-prompt .es18-chip-2 { animation-delay: -.8s; }
+.illustration--ai-prompt .es18-chip-3 { animation-delay: -1.6s; }
+.illustration--ai-prompt .es18-spark { transform-box: fill-box; transform-origin: center; animation: es18-twinkle 1.8s cubic-bezier(.45, 0, .55, 1) infinite alternate; }
+.illustration--ai-prompt .es18-shimmer { animation: es18-glow 2.8s cubic-bezier(.45, 0, .55, 1) infinite alternate; }
+.illustration--ai-prompt .es18-pop { transform-box: fill-box; transform-origin: center; animation: es18-pop 3.4s infinite; }
+
 /* Native reduced-motion — one rule kills every illustration
    animation. No static SVG, no JS. */
 @media (prefers-reduced-motion: reduce) {
