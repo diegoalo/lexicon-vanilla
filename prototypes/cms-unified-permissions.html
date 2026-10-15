@@ -83,6 +83,7 @@
     .perm-modal .list__title { text-decoration: none; cursor: pointer; }
     .perm-modal .list__title:hover { color: var(--color-dark); }
     .apply-to__sub { display: flex; flex-direction: column; gap: var(--spacing-3); padding-top: var(--spacing-3); }
+    .apply-to__scope { display: flex; flex-direction: column; gap: var(--spacing-3); }
 
     /* Roles × actions matrix: title (or type tabs) on the left, filter on the right */
     .matrix__head { display: flex; align-items: flex-end; gap: var(--spacing-5); flex-wrap: wrap; }
@@ -110,6 +111,12 @@
     .proto-panel__options .checkbox__label { font-size: var(--font-size-sm); }
     /* Parts switched off from the prototype options. In-memory only: a page refresh brings everything back. */
     [data-proto-off] { display: none !important; }
+    /* Delivery steps (prototype only). "mark" outlines and labels each part by step; "step1" hides what needs the step 2 data-model change */
+    .proto-step-badge { display: none; align-self: flex-start; }
+    [data-step-mode="mark"] .proto-step-badge { display: inline-flex; }
+    [data-step-mode="mark"] [data-step] { outline: 2px dashed var(--color-success); outline-offset: var(--spacing-2); border-radius: var(--rounded-sm); }
+    [data-step-mode="mark"] [data-step="2"] { outline-color: var(--color-warning); }
+    [data-step-mode="step1"] [data-step="2"] { display: none !important; }
 
     [hidden] { display: none !important; }
   </style>
@@ -213,7 +220,7 @@
     <div class="modal__body">
 
       <!-- What is selected -->
-      <div class="perm-modal__context" data-proto="context">
+      <div class="perm-modal__context" data-proto="context" data-step="1">
         <span class="sticker sticker--icon sticker--md" id="ctxSticker"><svg class="lexicon-icon"><use href="#web-content"></use></svg></span>
         <div class="perm-modal__context-text">
           <span class="perm-modal__context-name" id="ctxName">Retiro Park</span>
@@ -222,14 +229,16 @@
       </div>
 
       <!-- Where the current permissions come from -->
-      <div class="perm-modal__origin" data-proto="origin">
+      <div class="perm-modal__origin" data-proto="origin" data-step="2">
+        <span class="label label--sm label--warning proto-step-badge">Step 2</span>
         <span class="perm-modal__origin-label">Current permissions</span>
         <span class="label label--success" id="originLabel">Inherited from Parent</span>
         <span id="originText">Same as the folder defaults. Changes here make this item custom.</span>
       </div>
 
       <!-- Also apply to (kit List with select checkboxes; row goes is-active when checked) -->
-      <div class="perm-modal__block" id="applyTo" data-proto="applyTo">
+      <div class="perm-modal__block" id="applyTo" data-proto="applyTo" data-step="1">
+        <span class="label label--sm label--success proto-step-badge">Step 1</span>
         <header class="section section--sm"><span class="section__title">Also apply to</span></header>
         <ul class="list">
           <li class="list__row" id="optExisting">
@@ -241,6 +250,8 @@
               <label class="list__title" for="cbExisting" id="lblExisting">Existing items inside</label>
               <span class="list__subtitle" id="hintExisting">1 subfolder, 2 contents and 1 file, at any depth.</span>
               <div class="apply-to__sub" id="subExisting" hidden>
+                <div class="apply-to__scope" data-step="2">
+                <span class="label label--sm label--warning proto-step-badge">Step 2</span>
                 <label class="radio">
                   <input type="radio" name="scope" class="radio__input" checked id="rdInherit">
                   <span class="radio__box"></span>
@@ -251,10 +262,11 @@
                   <span class="radio__box"></span>
                   <span class="radio__label">All items, including the ones with custom permissions</span>
                 </label>
+                </div>
                 <div class="alert alert--simple alert--warning" id="overwriteWarn" hidden>
                   <div class="alert__content">
                     <svg class="lexicon-icon"><use href="#warning-full"></use></svg>
-                    <p class="alert__text"><strong>Warning:</strong> <span id="overwriteText">2 items</span> with custom permissions will be overwritten. This runs in the background and cannot be undone.</p>
+                    <p class="alert__text" id="overwriteMsg"><strong>Warning:</strong> <span id="overwriteText">2 items</span> with custom permissions will be overwritten. This runs in the background and cannot be undone.</p>
                   </div>
                 </div>
               </div>
@@ -277,7 +289,8 @@
       </div>
 
       <!-- Roles × actions -->
-      <div class="perm-modal__block matrix">
+      <div class="perm-modal__block matrix" data-step="1">
+        <span class="label label--sm label--success proto-step-badge">Step 1</span>
         <div class="matrix__head">
           <header class="section section--sm" id="matrixTitle"><span class="section__title">Roles and actions</span></header>
           <nav class="tabs" role="tablist" aria-label="Item type" id="typeTabs" data-proto="typeTabs" hidden>
@@ -299,7 +312,7 @@
         <div class="alert alert--simple alert--info" id="restoreNote" data-proto="restoreNote" hidden>
           <div class="alert__content">
             <svg class="lexicon-icon"><use href="#info-circle"></use></svg>
-            <p class="alert__text"><strong>Restored:</strong> the matrix now shows the defaults of Parent. Edit any box to keep a custom set, or save to follow Parent again.</p>
+            <p class="alert__text" id="restoreNoteText"><strong>Restored:</strong> the matrix now shows the defaults of Parent. Edit any box to keep a custom set, or save to follow Parent again.</p>
           </div>
         </div>
         <div id="matrixHost"></div>
@@ -309,7 +322,8 @@
 
     <!-- Kit rule: the first borderless button in .modal__footer sits on the left -->
     <footer class="modal__footer">
-      <button class="btn btn--borderless" type="button" id="restoreBtn" data-proto="restore">
+      <button class="btn btn--borderless" type="button" id="restoreBtn" data-proto="restore" data-step="1">
+        <span class="label label--sm label--success proto-step-badge">Step 1</span>
         <svg class="lexicon-icon"><use href="#restore"></use></svg>
         <span id="restoreText">Restore from Parent</span>
       </button>
@@ -333,6 +347,12 @@
     <label class="radio"><input type="radio" name="variant" class="radio__input" data-variant="space"><span class="radio__box"></span><span class="radio__label">A space</span></label>
     <label class="radio"><input type="radio" name="variant" class="radio__input" data-variant="multi"><span class="radio__box"></span><span class="radio__label">Several items</span></label>
     <span class="proto-panel__hint">The same Permissions entry opens in every case. Only the modal changes.</span>
+    <div class="proto-panel__options">
+      <span class="proto-panel__hint">Delivery steps</span>
+      <label class="radio"><input type="radio" name="stepMode" class="radio__input" data-step-mode="full" checked><span class="radio__box"></span><span class="radio__label">Full proposal</span></label>
+      <label class="radio"><input type="radio" name="stepMode" class="radio__input" data-step-mode="mark"><span class="radio__box"></span><span class="radio__label">Highlight steps</span></label>
+      <label class="radio"><input type="radio" name="stepMode" class="radio__input" data-step-mode="step1"><span class="radio__box"></span><span class="radio__label">Step 1 only</span></label>
+    </div>
     <div class="proto-panel__options" id="protoOptions" hidden>
       <span class="proto-panel__hint">Show or hide parts of the modal. Resets on page refresh.</span>
       <label class="checkbox"><input type="checkbox" class="checkbox__input" data-target="context" checked><span class="checkbox__box"><svg class="checkbox__icon checkbox__icon--check"><use href="#check-small"></use></svg><svg class="checkbox__icon checkbox__icon--hr"><use href="#hr"></use></svg></span><span class="checkbox__label">Selection header</span></label>
@@ -407,6 +427,7 @@
 
   var current = 'item';
   var restoring = false;
+  var stepMode = 'full';   // full | mark | step1
   var $ = function (id) { return document.getElementById(id); };
 
   // The dialog stays centred but must not jump while its body changes (filtering,
@@ -505,15 +526,26 @@
     }
 
     $('subExisting').hidden = !toExisting;
-    $('overwriteWarn').hidden = !(toExisting && $('rdAll').checked && v.existing.custom > 0);
-    if (toExisting) $('overwriteText').textContent = v.existing.custom + ' item' + (v.existing.custom === 1 ? '' : 's');
+    var step1 = stepMode === 'step1';
+    if (step1) {
+      // Step 1 has no inherited/custom state: pushing down replaces everything below
+      $('overwriteWarn').hidden = !toExisting;
+      $('overwriteMsg').innerHTML = '<strong>Warning:</strong> this replaces the permissions of everything below, including any changed by hand. It runs in the background and cannot be undone.';
+    } else {
+      $('overwriteWarn').hidden = !(toExisting && $('rdAll').checked && v.existing.custom > 0);
+      $('overwriteMsg').innerHTML = '<strong>Warning:</strong> <span id="overwriteText"></span> with custom permissions will be overwritten. This runs in the background and cannot be undone.';
+      if (toExisting) $('overwriteText').textContent = v.existing.custom + ' item' + (v.existing.custom === 1 ? '' : 's');
+    }
+    $('restoreNoteText').innerHTML = step1
+      ? '<strong>Restored:</strong> the matrix now shows the defaults of Parent. Save to apply them.'
+      : '<strong>Restored:</strong> the matrix now shows the defaults of Parent. Edit any box to keep a custom set, or save to follow Parent again.';
     $('optExisting').classList.toggle('is-active', toExisting);
     $('optDefault').classList.toggle('is-active', toDefault);
 
     var label = 'Save';
     if (toExisting) {
       var n = v.existing.count + (v.base || 0);
-      if ($('rdInherit').checked) n = n - v.existing.custom;
+      if (!step1 && $('rdInherit').checked) n = n - v.existing.custom;
       label = 'Save and apply to ' + n + ' item' + (n === 1 ? '' : 's');
     }
     if (toDefault && !toExisting) label = 'Save as default';
@@ -597,6 +629,14 @@
   });
   $('variantTabs').addEventListener('change', function (e) {
     var r = e.target.closest('.radio__input'); if (!r) return;
+    if (r.hasAttribute('data-step-mode')) {
+      stepMode = r.getAttribute('data-step-mode');
+      document.body.setAttribute('data-step-mode', stepMode);
+      updateTabsAndFooter();
+      lockHeight();
+      return;
+    }
+    if (!r.hasAttribute('data-variant')) return;
     applyVariant(r.getAttribute('data-variant'), true);
   });
   $('typeTabs').addEventListener('click', function (e) {
