@@ -133,6 +133,10 @@
     .page__nav .vert-nav__item { flex-direction: column; align-items: flex-start; gap: var(--spacing-1); }
     .page__nav .vert-nav__meta { font-size: var(--font-size-sm); font-weight: var(--font-weight-normal); opacity: 0.7; }
     .page__main { padding: var(--spacing-7); min-width: 0; }
+    /* One section only (a content, several items): no nav. The left padding is only the prototype
+       panel's lane; without the panel the content would start at the normal page gutter */
+    .page--single .page__body { grid-template-columns: minmax(0, 1fr) var(--page-aside-w); }
+    .page--single .page__main { padding-left: var(--page-nav-w); }
     .page__aside { border-left: 1px solid var(--color-secondary-l3); padding: var(--spacing-7); display: flex; flex-direction: column; gap: var(--spacing-6); }
     .page-section { display: flex; flex-direction: column; gap: var(--spacing-5); }
     .page-section__head { display: flex; flex-direction: column; gap: var(--spacing-2); }
@@ -879,6 +883,9 @@
 
   function renderNav() {
     var v = VARIANTS[current];
+    var single = v.page.sections.length === 1;   // a nav with one entry adds nothing
+    $('pageView').classList.toggle('page--single', single);
+    document.querySelector('.page__nav').hidden = single;
     if (stepMode === 'step1' && section === 'values') section = 'perms';   // Default Values is not part of step 1
     $('pageNav').innerHTML = v.page.sections.map(function (id) {
       var m = SECTION_META[id];
