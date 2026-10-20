@@ -66,8 +66,8 @@
     .perm-modal .modal__body { display: flex; flex-direction: column; gap: var(--spacing-6); }
     /* Responsive table: the matrix grows with its rows (the modal body scrolls vertically, as in the kit);
        only when the table is wider than the modal does its own container scroll horizontally */
-    .perm-modal #matrixHost { overflow-x: auto; }
-    .perm-modal #matrixHost .table { min-width: 100%; }
+    #matrixHost { overflow-x: auto; }
+    #matrixHost .table { min-width: 100%; }
     .perm-modal__block { display: flex; flex-direction: column; gap: var(--spacing-3); }
 
     /* What is selected: sticker + name + path, then the one-line origin */
@@ -118,6 +118,57 @@
     [data-step-mode="mark"] [data-step="2"] { outline-color: var(--color-warning); }
     [data-step-mode="step1"] [data-step="2"] { display: none !important; }
 
+    /* ── Page presentation (default): one settings page per entity, same skeleton everywhere ──
+       Nav column is as wide as the prototype panel lane, so the panel never covers content */
+    :root { --page-nav-w: calc(var(--proto-panel-w) + var(--spacing-7) * 2); --page-aside-w: calc(var(--spacing-10) * 5 + var(--spacing-5)); }
+    .page { display: flex; flex-direction: column; min-height: calc(100vh - 60px); background: var(--color-white); }
+    .page__header { display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-5); flex-wrap: wrap; padding: var(--spacing-4) var(--spacing-7); border-bottom: 1px solid var(--color-secondary-l3); }
+    .page__title-wrap { display: flex; align-items: center; gap: var(--spacing-4); min-width: 0; }
+    .page__title-text { display: flex; flex-direction: column; gap: var(--spacing-1); min-width: 0; }
+    .page__title { margin: 0; font-size: var(--font-size-lg); font-weight: var(--font-weight-bold); color: var(--color-dark); }
+    .page__path { font-size: var(--font-size-sm); color: var(--color-dark); opacity: 0.7; }
+    .page__actions { display: flex; align-items: center; gap: var(--spacing-3); }
+    .page__body { display: grid; grid-template-columns: var(--page-nav-w) minmax(0, 1fr) var(--page-aside-w); flex: 1 1 auto; }
+    .page__nav { border-right: 1px solid var(--color-secondary-l3); padding-block: var(--spacing-5); }
+    .page__nav .vert-nav__item { flex-direction: column; align-items: flex-start; gap: var(--spacing-1); }
+    .page__nav .vert-nav__meta { font-size: var(--font-size-sm); font-weight: var(--font-weight-normal); opacity: 0.7; }
+    .page__main { padding: var(--spacing-7); min-width: 0; }
+    .page__aside { border-left: 1px solid var(--color-secondary-l3); padding: var(--spacing-7); display: flex; flex-direction: column; gap: var(--spacing-6); }
+    .page-section { display: flex; flex-direction: column; gap: var(--spacing-5); }
+    .page-section__head { display: flex; flex-direction: column; gap: var(--spacing-2); }
+    .page-section__title { margin: 0; font-size: var(--font-size-md); font-weight: var(--font-weight-bold); color: var(--color-dark); }
+    .page-section__text { margin: 0; font-size: var(--font-size-sm); color: var(--color-dark); opacity: 0.75; }
+    .page-perm__bar { display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-4); flex-wrap: wrap; }
+    .page-perm__bar .btn--borderless { font-weight: var(--font-weight-semi); }
+    /* Default values (from the PIM concept): one row per field, state chip, value, how it applies */
+    .field-list { display: flex; flex-direction: column; gap: var(--spacing-6); }
+    .field-row { display: flex; flex-direction: column; gap: var(--spacing-2); }
+    .field-row__head { display: flex; align-items: center; gap: var(--spacing-3); flex-wrap: wrap; }
+    .field-row__head .input__label { margin: 0; }
+    .field-row__spacer { flex: 1 1 auto; }
+    .field-row__mode { display: flex; align-items: center; gap: var(--spacing-3); flex-wrap: wrap; }
+    .field-row__hint { font-size: var(--font-size-sm); color: var(--color-dark); opacity: 0.7; }
+    /* Side panel blocks */
+    .aside-block { display: flex; flex-direction: column; gap: var(--spacing-3); padding: var(--spacing-5); border: 1px solid var(--color-secondary-l3); border-radius: var(--rounded-md); }
+    .aside-block__title { margin: 0; font-size: var(--font-size-xs); font-weight: var(--font-weight-bold); text-transform: uppercase; letter-spacing: 0.04em; color: var(--color-dark); opacity: 0.7; }
+    .aside-stat { display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-3); font-size: var(--font-size-sm); color: var(--color-dark); }
+    .aside-stat strong { font-variant-numeric: tabular-nums; }
+    .aside-text { margin: 0; font-size: var(--font-size-sm); color: var(--color-dark); }
+    .aside-list { margin: 0; padding-left: var(--spacing-5); display: flex; flex-direction: column; gap: var(--spacing-2); font-size: var(--font-size-sm); color: var(--color-dark); }
+    .aside-block .btn--link { align-self: flex-start; padding: 0; height: auto; white-space: normal; text-align: left; }
+    /* Apply dialog */
+    .apply-modal { max-width: 640px; }
+    .apply-modal .modal__body { display: flex; flex-direction: column; gap: var(--spacing-6); }
+    .apply-group { display: flex; flex-direction: column; gap: var(--spacing-2); }
+    .apply-group .aside-list { padding-left: calc(var(--spacing-7) + var(--spacing-3)); }
+    .apply-scope { display: flex; flex-direction: column; gap: var(--spacing-3); }
+    #applyOverlay { z-index: 1002; }
+    /* Toast */
+    .toast-host { position: fixed; right: var(--spacing-7); bottom: var(--spacing-7); z-index: 1100; max-width: calc(var(--spacing-10) * 9); }
+    /* In page presentation the listing and the permissions modal are not shown */
+    [data-presentation="page"] #listingWrap, [data-presentation="page"] #permOverlay { display: none !important; }
+    [data-presentation="modal"] #pageView { display: none !important; }
+
     [hidden] { display: none !important; }
   </style>
 </head>
@@ -150,7 +201,7 @@
 </div>
 
 <!-- ─── App body: full-width listing (no sidebar, so the selection reads behind the modal) ── -->
-<div style="display: flex; flex-direction: column; min-height: calc(100vh - 60px);">
+<div id="listingWrap" style="display: flex; flex-direction: column; min-height: calc(100vh - 60px);">
 
   <main style="display: flex; flex-direction: column; min-width: 0;">
     <div class="content">
@@ -202,6 +253,123 @@
       </table>
     </div>
   </main>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PAGE PRESENTATION (default) · one settings page per entity
+     Folder and space: Permissions, Default Values, General.
+     Content and multi-selection: Permissions only, same skeleton.
+     The permissions pieces are moved here from the modal at runtime.
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="page" id="pageView">
+  <header class="page__header">
+    <div class="page__title-wrap">
+      <button class="btn btn--borderless btn--sm btn--icon" type="button" id="pageBack" aria-label="Back to Parent"><svg class="lexicon-icon"><use href="#angle-left"></use></svg></button>
+      <span class="sticker sticker--icon sticker--md" id="pageSticker"><svg class="lexicon-icon"><use href="#folder"></use></svg></span>
+      <div class="page__title-text">
+        <h1 class="page__title" id="pageTitle">Folder Settings: Child</h1>
+        <span class="page__path" id="pagePath">Madrid / Contents / Parent</span>
+      </div>
+    </div>
+    <div class="page__actions">
+      <button class="btn btn--secondary" type="button" id="pageCancel">Cancel</button>
+      <button class="btn btn--secondary" type="button" id="pageSave">Save</button>
+      <button class="btn btn--primary" type="button" id="pageApply" data-step="1"><span class="label label--sm label--success proto-step-badge">Step 1</span>Save and Apply to Items</button>
+    </div>
+  </header>
+
+  <div class="page__body">
+    <nav class="page__nav vert-nav" aria-label="Settings sections">
+      <ul class="vert-nav__list" id="pageNav"></ul>
+    </nav>
+
+    <main class="page__main">
+      <section class="page-section" id="pageSecPerms" aria-labelledby="pageSecPermsTitle">
+        <div class="page-section__head">
+          <h2 class="page-section__title" id="pageSecPermsTitle">Permissions</h2>
+          <p class="page-section__text" id="pagePermsText">Who can do what in this folder and in the items inside it.</p>
+        </div>
+        <div class="page-perm__bar" id="pagePermBar"></div>
+        <div id="pagePermMatrix"></div>
+      </section>
+
+      <section class="page-section" id="pageSecValues" aria-labelledby="pageSecValuesTitle" data-step="2" hidden>
+        <span class="label label--sm label--warning proto-step-badge">Later</span>
+        <div class="page-section__head">
+          <h2 class="page-section__title" id="pageSecValuesTitle">Default Values</h2>
+          <p class="page-section__text">Values the items inside start with. An item can change a field, and that field becomes custom for that item.</p>
+        </div>
+        <div class="field-list" id="pageFields"></div>
+        <div><button class="btn btn--secondary btn--sm" type="button" id="pageAddField"><svg class="lexicon-icon"><use href="#plus"></use></svg> Add Field</button></div>
+      </section>
+
+      <section class="page-section" id="pageSecGeneral" aria-labelledby="pageSecGeneralTitle" hidden>
+        <div class="page-section__head">
+          <h2 class="page-section__title" id="pageSecGeneralTitle">General</h2>
+        </div>
+        <div class="input">
+          <label class="input__label" for="genName">Name</label>
+          <input class="input__field" type="text" id="genName" value="Child">
+        </div>
+        <div class="input">
+          <label class="input__label" for="genDesc">Description</label>
+          <textarea class="input__field input__field--textarea" id="genDesc" rows="3"></textarea>
+        </div>
+      </section>
+    </main>
+
+    <aside class="page__aside" aria-label="Summary" data-proto="aside" id="pageAside"></aside>
+  </div>
+</div>
+
+<!-- ─── Apply dialog: the only modal left in the page presentation ── -->
+<div class="modal-overlay" id="applyOverlay" hidden>
+  <div class="modal apply-modal" role="dialog" aria-modal="true" aria-labelledby="applyTitle">
+    <header class="modal__header">
+      <h2 id="applyTitle" class="modal__title">Apply to items inside Child</h2>
+      <button class="btn btn--borderless btn--sm btn--icon modal__close" aria-label="Close" id="applyClose"><svg class="lexicon-icon"><use href="#times"></use></svg></button>
+    </header>
+    <div class="modal__body">
+      <div class="page-section__head">
+        <header class="section section--sm"><span class="section__title">What changes</span></header>
+      </div>
+      <p class="aside-text" id="applyEmpty">No changes yet. Edit a permission or a default value first.</p>
+      <div id="applyGroups"></div>
+      <header class="section section--sm"><span class="section__title">Which items</span></header>
+      <div class="apply-scope" data-step="2">
+        <span class="label label--sm label--warning proto-step-badge">Step 2</span>
+        <label class="radio"><input type="radio" name="applyScope" class="radio__input" id="applyFollow" checked><span class="radio__box"></span><span class="radio__label" id="applyFollowLabel">Only items that follow this folder (2)</span></label>
+        <label class="radio"><input type="radio" name="applyScope" class="radio__input" id="applyAll"><span class="radio__box"></span><span class="radio__label" id="applyAllLabel">All items, including custom ones (4)</span></label>
+      </div>
+      <div class="alert alert--simple alert--warning" id="applyWarn" hidden>
+        <div class="alert__content">
+          <svg class="lexicon-icon"><use href="#warning-full"></use></svg>
+          <p class="alert__text" id="applyWarnText"></p>
+        </div>
+      </div>
+      <div class="alert alert--simple alert--info">
+        <div class="alert__content">
+          <svg class="lexicon-icon"><use href="#info-circle"></use></svg>
+          <p class="alert__text">Changes run in the background. New default values follow each item's workflow, so published items become drafts until approved. Permission changes apply directly and never create drafts. You need permission to update every item affected.</p>
+        </div>
+      </div>
+    </div>
+    <footer class="modal__footer">
+      <button class="btn btn--secondary" type="button" id="applyCancel">Cancel</button>
+      <button class="btn btn--primary" type="button" id="applyGo">Apply to 2 Items</button>
+    </footer>
+  </div>
+</div>
+
+<!-- ─── Toast ── -->
+<div class="toast-host" id="toastHost" hidden>
+  <div class="alert alert--toast alert--success" role="status">
+    <div class="alert__content">
+      <svg class="lexicon-icon"><use href="#check-circle-full"></use></svg>
+      <p class="alert__text" id="toastText"><strong>Success:</strong> Saved.</p>
+    </div>
+    <button class="btn btn--borderless btn--sm btn--icon alert__close" aria-label="Close" id="toastClose"><svg class="lexicon-icon"><use href="#times"></use></svg></button>
+  </div>
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════
@@ -342,12 +510,17 @@
     <button class="btn btn--secondary btn--xs" type="button" id="protoOptionsBtn" aria-expanded="false" aria-controls="protoOptions">Options</button>
   </div>
   <div class="popover__body" id="variantTabs">
+    <span class="proto-panel__hint">Shown as</span>
+    <div class="btn-group" role="group" aria-label="Shown as" id="presentationSwitch">
+      <button class="btn btn--secondary btn--sm is-active" type="button" data-presentation="page" aria-pressed="true">Page</button>
+      <button class="btn btn--secondary btn--sm" type="button" data-presentation="modal" aria-pressed="false">Modal</button>
+    </div>
     <span class="proto-panel__hint">What is selected</span>
     <label class="radio"><input type="radio" name="variant" class="radio__input" data-variant="item" checked><span class="radio__box"></span><span class="radio__label">A content or a file</span></label>
     <label class="radio"><input type="radio" name="variant" class="radio__input" data-variant="folder"><span class="radio__box"></span><span class="radio__label">A folder</span></label>
     <label class="radio"><input type="radio" name="variant" class="radio__input" data-variant="space"><span class="radio__box"></span><span class="radio__label">A space</span></label>
     <label class="radio"><input type="radio" name="variant" class="radio__input" data-variant="multi"><span class="radio__box"></span><span class="radio__label">Several items</span></label>
-    <span class="proto-panel__hint">The same Permissions entry opens in every case. Only the modal changes.</span>
+    <span class="proto-panel__hint" id="protoHint">The same Permissions entry opens in every case. Only the page changes.</span>
     <div class="proto-panel__options">
       <span class="proto-panel__hint">Delivery steps</span>
       <label class="radio"><input type="radio" name="stepMode" class="radio__input" data-step-mode="full" checked><span class="radio__box"></span><span class="radio__label">Full proposal</span></label>
@@ -355,7 +528,7 @@
       <label class="radio"><input type="radio" name="stepMode" class="radio__input" data-step-mode="step1"><span class="radio__box"></span><span class="radio__label">Step 1 only</span></label>
     </div>
     <div class="proto-panel__options" id="protoOptions" hidden>
-      <span class="proto-panel__hint">Show or hide parts of the modal. Resets on page refresh.</span>
+      <span class="proto-panel__hint">Show or hide parts of the screen. Resets on page refresh.</span>
       <label class="checkbox"><input type="checkbox" class="checkbox__input" data-target="context" checked><span class="checkbox__box"><svg class="checkbox__icon checkbox__icon--check"><use href="#check-small"></use></svg><svg class="checkbox__icon checkbox__icon--hr"><use href="#hr"></use></svg></span><span class="checkbox__label">Selection header</span></label>
       <label class="checkbox"><input type="checkbox" class="checkbox__input" data-target="origin" checked><span class="checkbox__box"><svg class="checkbox__icon checkbox__icon--check"><use href="#check-small"></use></svg><svg class="checkbox__icon checkbox__icon--hr"><use href="#hr"></use></svg></span><span class="checkbox__label">Current permissions line</span></label>
       <label class="checkbox"><input type="checkbox" class="checkbox__input" data-target="applyTo" checked><span class="checkbox__box"><svg class="checkbox__icon checkbox__icon--check"><use href="#check-small"></use></svg><svg class="checkbox__icon checkbox__icon--hr"><use href="#hr"></use></svg></span><span class="checkbox__label">"Also apply to" block</span></label>
@@ -363,6 +536,7 @@
       <label class="checkbox"><input type="checkbox" class="checkbox__input" data-target="filter" checked><span class="checkbox__box"><svg class="checkbox__icon checkbox__icon--check"><use href="#check-small"></use></svg><svg class="checkbox__icon checkbox__icon--hr"><use href="#hr"></use></svg></span><span class="checkbox__label">Role filter</span></label>
       <label class="checkbox"><input type="checkbox" class="checkbox__input" data-target="restoreNote" checked><span class="checkbox__box"><svg class="checkbox__icon checkbox__icon--check"><use href="#check-small"></use></svg><svg class="checkbox__icon checkbox__icon--hr"><use href="#hr"></use></svg></span><span class="checkbox__label">Restore note</span></label>
       <label class="checkbox"><input type="checkbox" class="checkbox__input" data-target="restore" checked><span class="checkbox__box"><svg class="checkbox__icon checkbox__icon--check"><use href="#check-small"></use></svg><svg class="checkbox__icon checkbox__icon--hr"><use href="#hr"></use></svg></span><span class="checkbox__label">Restore from Parent button</span></label>
+      <label class="checkbox"><input type="checkbox" class="checkbox__input" data-target="aside" checked><span class="checkbox__box"><svg class="checkbox__icon checkbox__icon--check"><use href="#check-small"></use></svg><svg class="checkbox__icon checkbox__icon--hr"><use href="#hr"></use></svg></span><span class="checkbox__label">Page side panel</span></label>
     </div>
   </div>
 </aside>
@@ -401,40 +575,87 @@
       icon: '#web-content', name: 'Retiro Park', path: 'Basic Web Content · Madrid / Contents / Parent',
       origin: { tone: 'success', label: 'Inherited from Parent', text: 'Same as the folder defaults. Changes here make this item custom.' },
       existing: null, def: null,
-      type: 'content', restore: 'Restore from Parent', rows: ['item']
+      type: 'content', restore: 'Restore from Parent', rows: ['item'],
+      page: { title: 'Permissions: Retiro Park', path: 'Basic Web Content · Madrid / Contents / Parent', back: 'Back to Parent',
+              text: 'Who can see and change this content.', sections: ['perms'], aside: 'item' }
     },
     folder: {
       icon: '#folder', name: 'Child', path: 'Folder · Madrid / Contents / Parent',
       origin: { tone: 'warning', label: 'Custom', text: 'Changed by Laura Méndez on Sep 30, 2026. No longer follows Parent.' },
       existing: { label: 'Existing items inside', hint: '1 subfolder and 3 contents, at any depth.', count: 4, custom: 2 },
       def: { label: 'New items created inside', hint: 'Becomes the default for anything created later in this folder and its subfolders.' },
-      type: 'folder', types: ['folder', 'content'], restore: 'Restore from Parent', rows: ['folder']
+      type: 'folder', types: ['folder', 'content'], restore: 'Restore from Parent', rows: ['folder'],
+      page: { title: 'Folder Settings: Child', path: 'Madrid / Contents / Parent', back: 'Back to Parent',
+              text: 'Who can do what in this folder and in the items inside it. Saving also sets what new items created inside get.',
+              sections: ['perms', 'values', 'general'], aside: 'inside',
+              inside: { title: 'Inside this folder', stats: [['Subfolders', 1], ['Contents', 3]], follow: 2, custom: 2, noun: 'folder' },
+              total: 4, custom: 2, applyTitle: 'Apply to items inside Child',
+              saveMsg: 'Saved. New items created in Child will use these settings. Existing items did not change.',
+              general: { name: 'Child', desc: 'Guides and practical information for visitors to Madrid.' },
+              fields: [
+                { id: 'city', name: 'City', mode: 'override', value: 'Madrid', parentValue: 'Madrid', origin: 'inherited' },
+                { id: 'audience', name: 'Audience', mode: 'override', value: 'Visitors', origin: 'here' },
+                { id: 'hours', name: 'Opening Hours', mode: 'override', value: 'Every day, 9:00 to 21:00', parentValue: 'Every day, 10:00 to 20:00', origin: 'custom' },
+                { id: 'tip', name: 'Visitor Tip', mode: 'append', value: 'Free entry on weekdays.', origin: 'here', long: true }
+              ],
+              pool: [{ id: 'access', name: 'Accessibility', mode: 'override', value: 'Step-free access at the main entrance.', origin: 'here' },
+                     { id: 'keywords', name: 'Keywords', mode: 'append', value: 'outdoors, family', origin: 'here' }] }
     },
     space: {
       initials: 'M', name: 'Madrid', path: 'Space · 2 folders, 9 contents, 1 file',
       origin: { tone: 'secondary', label: 'Space root', text: 'Nothing above a space. Defaults here seed every folder.' },
       existing: { label: 'Existing items in the space', hint: '2 folders, 9 contents and 1 file, at any depth.', count: 12, custom: 1 },
       def: { label: 'New items created in the space', hint: 'Default for anything created later in any folder of the space.' },
-      type: 'space', types: ['folder', 'content', 'file'], restore: null, rows: []
+      type: 'space', types: ['folder', 'content', 'file'], restore: null, rows: [],
+      page: { title: 'Space Settings: Madrid', path: 'Space · All Spaces', back: 'Back to All Spaces',
+              text: 'Who can do what in this space and in everything inside it. Saving also sets what new items created in the space get.',
+              sections: ['perms', 'values', 'general'], aside: 'inside',
+              inside: { title: 'Inside this space', stats: [['Folders', 2], ['Contents', 9], ['Files', 1]], follow: 11, custom: 1, noun: 'space' },
+              total: 12, custom: 1, applyTitle: 'Apply to items in Madrid',
+              saveMsg: 'Saved. New items created in Madrid will use these settings. Existing items did not change.',
+              general: { name: 'Madrid', desc: 'Everything the city tourism team publishes about Madrid.' },
+              fields: [
+                { id: 'city', name: 'City', mode: 'override', value: 'Madrid', origin: 'here' },
+                { id: 'lang', name: 'Language', mode: 'override', value: 'Spanish', origin: 'here' }
+              ],
+              pool: [{ id: 'audience', name: 'Audience', mode: 'override', value: 'Visitors', origin: 'here' }] }
     },
     multi: {
       icon: '#list', name: '3 items selected', path: 'Child, Retiro Park, San Isidro Festival · Madrid / Contents / Parent',
       origin: { tone: 'info', label: 'Mixed', text: '2 items inherit from Parent, 1 is custom.' },
       existing: { label: 'Also everything inside the selected folders', hint: 'Child contains 1 content.', count: 1, custom: 0 },
       def: null,
-      base: 3, type: 'folder', types: ['folder', 'content'], restore: 'Restore selected from Parent', rows: ['folder', 'item', 'item2']
+      base: 3, type: 'folder', types: ['folder', 'content'], restore: 'Restore selected from Parent', rows: ['folder', 'item', 'item2'],
+      page: { title: 'Permissions: 3 items', path: 'Child, Retiro Park, San Isidro Festival · Madrid / Contents / Parent', back: 'Back to Parent',
+              text: 'Who can do what in the selected items and inside the selected folders.', sections: ['perms'], aside: 'selection',
+              total: 4, custom: 1, applyTitle: 'Apply to the selected items',
+              saveMsg: 'Saved. Permissions of the 3 selected items updated.' }
     }
   };
 
   var current = 'item';
   var restoring = false;
   var stepMode = 'full';   // full | mark | step1
+  var presentation = 'page';   // page (default) | modal
+  var section = 'perms';
+  var edits = {};              // type|role|action -> checked, only where it differs from the base
+  var matrixType = 'content';
+  var fields = [], baseFields = [], pool = [];
+  var TYPE_LABEL = { folder: 'folders', content: 'contents', file: 'files', space: 'space' };
+  var MODE_HINT = {
+    override: 'Fills the field on items that leave it empty or still follow this folder.',
+    append: "Added after the item's own value.",
+    prepend: "Added before the item's own value."
+  };
+  var clone = function (x) { return JSON.parse(JSON.stringify(x || [])); };
+  var esc = function (t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
   var $ = function (id) { return document.getElementById(id); };
 
   // The dialog stays centred but must not jump while its body changes (filtering,
   // disclosing options, switching tabs). Once a case is applied, measure the tallest
   // state it can reach and lock the modal to that height; the body scrolls inside.
   function lockHeight() {
+    if (presentation !== 'modal') return;
     var modal = document.querySelector('.perm-modal');
     var reveal = ['subExisting', 'overwriteWarn', 'typeTabs', 'tabScope', 'restoreNote'].map($)
       .concat(Array.prototype.slice.call(document.querySelectorAll('#matrixHost tbody tr[hidden]')));
@@ -456,7 +677,9 @@
       '<svg class="checkbox__icon checkbox__icon--hr"><use href="#hr"></use></svg></span></label>';
   }
 
+  function baseOn(r, a) { return !!r.all || !!(r.some && r.some.indexOf(a) > -1); }
   function renderMatrix(type) {
+    matrixType = type;
     var actions = ACTIONS[type];
     var roles = restoring ? PARENT_DEFAULTS : ROLES;
     var html = '<table class="table"><thead><tr><th scope="col">Role</th>';
@@ -466,7 +689,8 @@
       var icon = r.kind === 'space' ? '#globe' : '#user';
       html += '<tr><td><span class="matrix__role"><svg class="lexicon-icon"><use href="' + icon + '"></use></svg><span>' + r.name + '</span></span></td>';
       actions.forEach(function (a) {
-        var on = !!r.all || (r.some && r.some.indexOf(a) > -1);
+        var k = type + '|' + r.name + '|' + a;
+        var on = k in edits ? edits[k] : baseOn(r, a);
         html += '<td>' + checkboxHTML(on, r.name + ' · ' + a) + '</td>';
       });
       html += '</tr>';
@@ -501,7 +725,7 @@
     var v = VARIANTS[current];
     var toExisting = !!(v.existing && $('cbExisting').checked);
     var toDefault = !!(v.def && $('cbDefault').checked);
-    var propagating = toExisting || toDefault;
+    var propagating = toExisting || toDefault || (presentation === 'page' && !!v.types);
 
     // Propagating means several item types at once → one matrix per type, switched by tabs
     $('typeTabs').hidden = !propagating;
@@ -554,6 +778,7 @@
     $('saveBtn').textContent = label;
     $('restoreNote').hidden = !restoring;
     $('restoreBtn').disabled = restoring;
+    if (presentation === 'page') renderAside();
   }
 
   function flash(el) {
@@ -570,7 +795,10 @@
   function applyVariant(key, withFlash) {
     current = key;
     restoring = false;
+    edits = {};
     var v = VARIANTS[key];
+    fields = clone(v.page && v.page.fields); baseFields = clone(fields); pool = clone(v.page && v.page.pool);
+    if (presentation === 'page') withFlash = false;
 
     // Context row
     var st = $('ctxSticker');
@@ -610,8 +838,197 @@
     $('crumbSpace').classList.toggle('is-selected', key === 'space');
     if (withFlash && key === 'space') flash($('crumbSpace'));
 
+    if (presentation === 'page') renderPage();
     updateTabsAndFooter();
     lockHeight();
+  }
+
+  // ══ Page presentation ══════════════════════════════════════════════════
+  var nodeOrigin = document.querySelector('.perm-modal__origin');
+  var nodeMatrix = document.querySelector('.perm-modal__block.matrix');
+  var nodeRestore = $('restoreBtn');
+
+  function setPresentation(p) {
+    presentation = p;
+    document.body.setAttribute('data-presentation', p);
+    $('presentationSwitch').querySelectorAll('[data-presentation]').forEach(function (b) {
+      var on = b.getAttribute('data-presentation') === p;
+      b.classList.toggle('is-active', on); b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    $('protoHint').textContent = 'The same Permissions entry opens in every case. Only the ' + (p === 'page' ? 'page' : 'modal') + ' changes.';
+    if (p === 'page') {
+      $('pagePermBar').appendChild(nodeOrigin);
+      $('pagePermBar').appendChild(nodeRestore);
+      nodeRestore.classList.add('btn--sm');
+      $('pagePermMatrix').appendChild(nodeMatrix);
+    } else {
+      document.querySelector('.perm-modal__context').after(nodeOrigin);
+      $('applyTo').after(nodeMatrix);
+      nodeRestore.classList.remove('btn--sm');
+      document.querySelector('.perm-modal .modal__footer').prepend(nodeRestore);
+      $('applyOverlay').hidden = true;
+    }
+    applyVariant(current);
+  }
+
+  var SECTION_META = {
+    perms: { label: 'Permissions', meta: function () { var o = $('originLabel').textContent; return o; } },
+    values: { label: 'Default Values', meta: function () { return fields.length + ' field' + (fields.length === 1 ? '' : 's'); } },
+    general: { label: 'General', meta: function () { return 'Name and description'; } }
+  };
+
+  function renderNav() {
+    var v = VARIANTS[current];
+    if (stepMode === 'step1' && section === 'values') section = 'perms';   // Default Values is not part of step 1
+    $('pageNav').innerHTML = v.page.sections.map(function (id) {
+      var m = SECTION_META[id];
+      var step = id === 'values' ? ' data-step="2"' : '';
+      return '<li class="vert-nav__item' + (id === section ? ' is-active' : '') + '" role="link" tabindex="0" data-section="' + id + '"' +
+        (id === section ? ' aria-current="page"' : '') + step + '><span>' + m.label + '</span><span class="vert-nav__meta">' + esc(m.meta()) + '</span></li>';
+    }).join('');
+    ['perms', 'values', 'general'].forEach(function (id) {
+      $('pageSec' + id.charAt(0).toUpperCase() + id.slice(1)).hidden = id !== section;
+    });
+  }
+
+  function chip(f) {
+    if (f.origin === 'inherited') return '<span class="label label--sm label--success">Inherited from Parent</span>';
+    if (f.origin === 'custom') return '<span class="label label--sm label--warning">Custom</span>';
+    return '<span class="label label--sm label--secondary">Set here</span>';
+  }
+
+  function renderFields() {
+    $('pageFields').innerHTML = fields.map(function (f) {
+      var input = f.long
+        ? '<textarea class="input__field input__field--textarea" id="fld-' + f.id + '" rows="2" data-fid="' + f.id + '">' + esc(f.value) + '</textarea>'
+        : '<input class="input__field" type="text" id="fld-' + f.id + '" value="' + esc(f.value) + '" data-fid="' + f.id + '">';
+      var modes = ['override', 'append', 'prepend'].map(function (m) {
+        return '<button class="btn btn--secondary btn--sm' + (f.mode === m ? ' is-active' : '') + '" type="button" data-mode="' + m + '" data-fid="' + f.id + '" aria-pressed="' + (f.mode === m) + '">' + m.charAt(0).toUpperCase() + m.slice(1) + '</button>';
+      }).join('');
+      return '<div class="field-row">' +
+        '<div class="field-row__head"><label class="input__label" for="fld-' + f.id + '">' + esc(f.name) + '</label>' + chip(f) +
+        '<span class="field-row__spacer"></span>' +
+        (f.origin === 'custom' ? '<button class="btn btn--borderless btn--sm" type="button" data-restore="' + f.id + '"><svg class="lexicon-icon"><use href="#restore"></use></svg> Restore from Parent</button>' : '') +
+        '<button class="btn btn--borderless btn--sm btn--icon" type="button" data-remove="' + f.id + '" aria-label="Remove ' + esc(f.name) + '"><svg class="lexicon-icon"><use href="#times"></use></svg></button></div>' +
+        input +
+        (f.origin === 'custom' ? '<span class="field-row__hint">Parent uses: ' + esc(f.parentValue) + '</span>' : '') +
+        '<div class="field-row__mode"><span class="field-row__hint">Applies as</span><div class="btn-group" role="group" aria-label="How ' + esc(f.name) + ' applies">' + modes + '</div>' +
+        '<span class="field-row__hint">' + MODE_HINT[f.mode] + '</span></div></div>';
+    }).join('');
+    $('pageAddField').disabled = pool.length === 0;
+  }
+
+  function valueChanges() {
+    var out = [];
+    fields.forEach(function (f) {
+      var b = baseFields.filter(function (x) { return x.id === f.id; })[0];
+      if (!b) { out.push(f.name + ' added'); return; }
+      if (b.value !== f.value) out.push(f.name + ': ' + f.value);
+      if (b.mode !== f.mode) out.push(f.name + ' now applies as ' + f.mode.charAt(0).toUpperCase() + f.mode.slice(1));
+    });
+    baseFields.forEach(function (b) { if (!fields.some(function (f) { return f.id === b.id; })) out.push(b.name + ' removed'); });
+    return out;
+  }
+  function permChanges() {
+    var out = Object.keys(edits).map(function (k) {
+      var p = k.split('|');
+      return p[1] + (edits[k] ? ' can now ' : ' can no longer ') + p[2] + ' (' + TYPE_LABEL[p[0]] + ')';
+    });
+    if (restoring) out.unshift('Restored from Parent');
+    return out;
+  }
+
+  function renderAside() {
+    var v = VARIANTS[current], pg = v.page, html = '';
+    if (pg.aside === 'inside') {
+      html += '<div class="aside-block"><h3 class="aside-block__title">' + pg.inside.title + '</h3>' +
+        pg.inside.stats.map(function (st) { return '<div class="aside-stat"><span>' + st[0] + '</span><strong>' + st[1] + '</strong></div>'; }).join('') +
+        '<div class="aside-block" data-step="2" style="padding: 0; border: 0;"><span class="label label--sm label--warning proto-step-badge">Step 2</span>' +
+        '<div class="aside-stat"><span>Follow this ' + pg.inside.noun + '</span><strong>' + pg.inside.follow + '</strong></div>' +
+        '<div class="aside-stat"><span>Have custom settings</span><strong>' + pg.inside.custom + '</strong></div>' +
+        '<button class="btn btn--link btn--sm" type="button">Show items with custom settings</button></div></div>';
+    } else if (pg.aside === 'item') {
+      html += '<div class="aside-block" data-step="2"><span class="label label--sm label--warning proto-step-badge">Later</span><h3 class="aside-block__title">From folder Parent</h3>' +
+        '<div class="aside-stat"><span>Default values</span><span class="label label--sm label--warning">1 custom</span></div>' +
+        '<p class="aside-text">3 of 4 fields follow Parent. Opening Hours was changed here.</p></div>';
+    } else if (pg.aside === 'selection') {
+      html += '<div class="aside-block"><h3 class="aside-block__title">Selected items</h3><ul class="aside-list">' +
+        '<li>Child (folder) <span class="label label--sm label--warning">Custom</span></li>' +
+        '<li>Retiro Park <span class="label label--sm label--success">Inherited</span></li>' +
+        '<li>San Isidro Festival <span class="label label--sm label--success">Inherited</span></li></ul></div>';
+    }
+    var vc = valueChanges(), pc = permChanges();
+    html += '<div class="aside-block"><h3 class="aside-block__title">Unsaved changes</h3>' +
+      (vc.length + pc.length === 0 ? '<p class="aside-text">Nothing changed yet.</p>' :
+        (pc.length ? '<p class="aside-text"><strong>Permissions</strong></p><ul class="aside-list">' + pc.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>' : '') +
+        (vc.length ? '<p class="aside-text"><strong>Default values</strong></p><ul class="aside-list">' + vc.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>' : '')) +
+      '</div>';
+    $('pageAside').innerHTML = html;
+    if ($('pageNav').children.length) renderNavMetaOnly();
+  }
+  function renderNavMetaOnly() {
+    $('pageNav').querySelectorAll('[data-section]').forEach(function (li) {
+      li.querySelector('.vert-nav__meta').textContent = SECTION_META[li.getAttribute('data-section')].meta();
+    });
+  }
+
+  function renderPage() {
+    var v = VARIANTS[current], pg = v.page;
+    if (pg.sections.indexOf(section) < 0) section = 'perms';
+    $('pageTitle').textContent = pg.title;
+    $('pagePath').textContent = pg.path;
+    $('pageBack').setAttribute('aria-label', pg.back);
+    var st = $('pageSticker');
+    st.className = v.initials ? 'sticker sticker--outline sticker--primary sticker--md' : 'sticker sticker--icon sticker--md';
+    st.innerHTML = v.initials ? v.initials : '<svg class="lexicon-icon"><use href="' + v.icon + '"></use></svg>';
+    $('pagePermsText').textContent = pg.text;
+    $('pageApply').hidden = !pg.total;
+    // Without "Save and Apply to Items", Save is the page's main action
+    $('pageSave').classList.toggle('btn--primary', !pg.total);
+    $('pageSave').classList.toggle('btn--secondary', !!pg.total);
+    if (pg.general) { $('genName').value = pg.general.name; $('genDesc').value = pg.general.desc; }
+    renderNav();
+    renderFields();
+    renderAside();
+  }
+
+  // ── Apply dialog ─────────────────────────────────────────────────────
+  var include = { values: true, perms: true };
+  function renderApply() {
+    var v = VARIANTS[current], pg = v.page;
+    var vc = valueChanges(), pc = permChanges();
+    $('applyTitle').textContent = pg.applyTitle;
+    $('applyEmpty').hidden = vc.length + pc.length > 0;
+    var groups = [];
+    if (pc.length) groups.push(['perms', 'Permissions (' + pc.length + ')', pc]);
+    if (vc.length) groups.push(['values', 'Default values (' + vc.length + ')', vc]);
+    $('applyGroups').innerHTML = groups.map(function (g) {
+      return '<div class="apply-group"><label class="checkbox"><input type="checkbox" class="checkbox__input" data-include="' + g[0] + '"' + (include[g[0]] ? ' checked' : '') + '>' +
+        '<span class="checkbox__box"><svg class="checkbox__icon checkbox__icon--check"><use href="#check-small"></use></svg><svg class="checkbox__icon checkbox__icon--hr"><use href="#hr"></use></svg></span>' +
+        '<span class="checkbox__label">' + g[1] + '</span></label><ul class="aside-list">' + g[2].map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul></div>';
+    }).join('');
+    var follow = pg.total - pg.custom, step1 = stepMode === 'step1';
+    $('applyFollowLabel').textContent = 'Only items that follow this ' + (current === 'space' ? 'space' : current === 'multi' ? 'selection' : 'folder') + ' (' + follow + '). Items with custom settings keep them.';
+    $('applyAllLabel').textContent = 'All items, including custom ones (' + pg.total + ')';
+    var all = step1 || $('applyAll').checked;
+    var n = all ? pg.total : follow;
+    $('applyWarn').hidden = !all;
+    $('applyWarnText').innerHTML = step1
+      ? '<strong>Warning:</strong> this replaces the settings of all ' + pg.total + ' items, including any changed by hand. It can\'t be undone.'
+      : '<strong>Warning:</strong> custom settings on ' + pg.custom + ' item' + (pg.custom === 1 ? '' : 's') + ' will be replaced. They will follow again after the change. It can\'t be undone.';
+    var any = (pc.length && include.perms) || (vc.length && include.values);
+    $('applyGo').textContent = 'Apply to ' + n + ' Item' + (n === 1 ? '' : 's');
+    $('applyGo').disabled = !any;
+  }
+  function openApply() { include = { values: true, perms: true }; $('applyFollow').checked = true; renderApply(); $('applyOverlay').hidden = false; $('applyClose').focus(); }
+  function closeApply() { $('applyOverlay').hidden = true; $('pageApply').focus(); }
+
+  // ── Toast ────────────────────────────────────────────────────────────
+  var toastTimer;
+  function toast(msg) {
+    $('toastText').innerHTML = '<strong>Success:</strong> ' + esc(msg);
+    $('toastHost').hidden = false;
+    clearTimeout(toastTimer); toastTimer = setTimeout(function () { $('toastHost').hidden = true; }, 6000);
   }
 
   // ── Wiring ────────────────────────────────────────────────────────
@@ -634,6 +1051,8 @@
       stepMode = r.getAttribute('data-step-mode');
       document.body.setAttribute('data-step-mode', stepMode);
       updateTabsAndFooter();
+      if (!$('applyOverlay').hidden) renderApply();
+      if (presentation === 'page') renderNav();
       lockHeight();
       return;
     }
@@ -653,6 +1072,7 @@
     ol.className = 'label label--info';
     ol.textContent = 'Will inherit from Parent';
     $('originText').textContent = 'Values below are the defaults of Parent. Nothing changes until you save.';
+    edits = {};
     updateTabsAndFooter();
   });
   $('roleFilter').addEventListener('input', filterRoles);
@@ -661,10 +1081,85 @@
   // Prototype: the modal never closes. X, Cancel and Save reset it to the initial state of the selected case.
   function reset() { applyVariant(current); $('roleFilter').value = ''; filterRoles(); document.querySelector('.perm-modal .modal__body').scrollTop = 0; $('matrixHost').scrollLeft = 0; }
   $('closeBtn').addEventListener('click', reset);
+
+  // Page wiring
+  $('presentationSwitch').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-presentation]'); if (!b || b.getAttribute('data-presentation') === presentation) return;
+    setPresentation(b.getAttribute('data-presentation'));
+  });
+  $('pageNav').addEventListener('click', function (e) {
+    var li = e.target.closest('[data-section]'); if (!li) return;
+    section = li.getAttribute('data-section'); renderNav();
+  });
+  $('pageNav').addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    var li = e.target.closest('[data-section]'); if (!li) return;
+    e.preventDefault(); section = li.getAttribute('data-section'); renderNav();
+    $('pageNav').querySelector('[data-section="' + section + '"]').focus();
+  });
+  $('matrixHost').addEventListener('change', function (e) {
+    var cb = e.target.closest('.checkbox__input'); if (!cb) return;
+    var td = cb.closest('td'), tr = cb.closest('tr');
+    var role = tr.querySelector('td:first-child').textContent.trim();
+    var action = ACTIONS[matrixType][td.cellIndex - 1];
+    var r = (restoring ? PARENT_DEFAULTS : ROLES).filter(function (x) { return x.name === role; })[0];
+    var k = matrixType + '|' + role + '|' + action;
+    if (cb.checked === baseOn(r, action)) delete edits[k]; else edits[k] = cb.checked;
+    if (presentation === 'page') renderAside();
+  });
+  $('pageFields').addEventListener('input', function (e) {
+    var id = e.target.getAttribute('data-fid'); if (!id || !e.target.classList.contains('input__field')) return;
+    var f = fields.filter(function (x) { return x.id === id; })[0];
+    f.value = e.target.value;
+    if (f.parentValue !== undefined) {
+      var was = f.origin;
+      f.origin = f.value === f.parentValue ? 'inherited' : 'custom';
+      if (was !== f.origin) { var pos = e.target.selectionStart; renderFields(); var el = $('fld-' + id); el.focus(); el.setSelectionRange(pos, pos); }
+    }
+    renderAside();
+  });
+  $('pageFields').addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    var id = b.getAttribute('data-fid') || b.getAttribute('data-restore') || b.getAttribute('data-remove');
+    var f = fields.filter(function (x) { return x.id === id; })[0];
+    if (b.hasAttribute('data-mode')) f.mode = b.getAttribute('data-mode');
+    else if (b.hasAttribute('data-restore')) { f.value = f.parentValue; f.origin = 'inherited'; }
+    else if (b.hasAttribute('data-remove')) {
+      fields = fields.filter(function (x) { return x.id !== id; });
+      if (!baseFields.some(function (x) { return x.id === id; })) pool.unshift(f);
+    }
+    renderFields(); renderAside();
+  });
+  $('pageAddField').addEventListener('click', function () {
+    if (!pool.length) return;
+    fields.push(pool.shift()); renderFields(); renderAside();
+    $('fld-' + fields[fields.length - 1].id).focus();
+  });
+  $('pageCancel').addEventListener('click', function () { applyVariant(current); });
+  $('pageSave').addEventListener('click', function () {
+    var pg = VARIANTS[current].page;
+    var msg = pg.saveMsg || ('Saved. Permissions of ' + VARIANTS[current].name + ' updated.');
+    applyVariant(current); toast(msg);
+  });
+  $('pageApply').addEventListener('click', openApply);
+  $('applyClose').addEventListener('click', closeApply);
+  $('applyCancel').addEventListener('click', closeApply);
+  $('applyGroups').addEventListener('change', function (e) {
+    var cb = e.target.closest('[data-include]'); if (!cb) return;
+    include[cb.getAttribute('data-include')] = cb.checked; renderApply();
+  });
+  ['applyFollow', 'applyAll'].forEach(function (id) { $(id).addEventListener('change', renderApply); });
+  $('applyGo').addEventListener('click', function () {
+    var n = $('applyGo').textContent.replace('Apply to ', '').toLowerCase();
+    closeApply(); applyVariant(current);
+    toast('Saved. Applying to ' + n + ' in the background. You will get a notification when it finishes.');
+  });
+  $('toastClose').addEventListener('click', function () { $('toastHost').hidden = true; });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !$('applyOverlay').hidden) closeApply(); });
   $('cancelBtn').addEventListener('click', reset);
   $('saveBtn').addEventListener('click', reset);
 
-  applyVariant('item');
+  setPresentation('page');
 })();
 </script>
 
