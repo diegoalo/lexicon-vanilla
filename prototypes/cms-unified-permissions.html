@@ -175,7 +175,7 @@
     .toast-host { position: fixed; right: var(--spacing-7); bottom: var(--spacing-7); z-index: 1100; max-width: calc(var(--spacing-10) * 9); }
     /* In page presentation the listing and the permissions modal are not shown */
     [data-presentation="page"] #listingWrap, [data-presentation="page"] #permOverlay { display: none !important; }
-    [data-presentation="modal"] #pageView { display: none !important; }
+    [data-presentation="modal"] #pageView, [data-presentation="modal"] [data-page-only] { display: none !important; }
 
     [hidden] { display: none !important; }
   </style>
@@ -362,7 +362,7 @@
       <div class="alert alert--simple alert--info">
         <div class="alert__content">
           <svg class="lexicon-icon"><use href="#info-circle"></use></svg>
-          <p class="alert__text">Changes run in the background. New default values follow each item's workflow, so published items become drafts until approved. Permission changes apply directly and never create drafts. You need permission to update every item affected.</p>
+          <p class="alert__text" id="applyNote">Changes run in the background and apply directly. Permission changes never create drafts. You need permission to update every item affected.</p>
         </div>
       </div>
     </div>
@@ -533,6 +533,11 @@
     <label class="radio"><input type="radio" name="variant" class="radio__input" data-variant="folder"><span class="radio__box"></span><span class="radio__label">A folder</span></label>
     <label class="radio"><input type="radio" name="variant" class="radio__input" data-variant="space"><span class="radio__box"></span><span class="radio__label">A space</span></label>
     <label class="radio"><input type="radio" name="variant" class="radio__input" data-variant="multi"><span class="radio__box"></span><span class="radio__label">Several items</span></label>
+    <div class="proto-panel__options" data-page-only>
+      <span class="proto-panel__hint">Opened from</span>
+      <label class="radio"><input type="radio" name="entry" class="radio__input" data-entry="perms" checked><span class="radio__box"></span><span class="radio__label">⋮ › Permissions</span></label>
+      <label class="radio"><input type="radio" name="entry" class="radio__input" data-entry="settings"><span class="radio__box"></span><span class="radio__label">⋮ › Edit / Settings</span></label>
+    </div>
     <span class="proto-panel__hint" id="protoHint">The same Permissions entry opens in every case. Only the page changes.</span>
     <div class="proto-panel__options">
       <span class="proto-panel__hint">Delivery steps</span>
@@ -578,6 +583,7 @@
   ];
   var ACTIONS = {
     folder:  ['Add Entry', 'Add Subfolder', 'Delete', 'Permissions', 'Subscribe', 'Update', 'View'],
+    subfolder: ['Add Entry', 'Add Subfolder', 'Delete', 'Permissions', 'Subscribe', 'Update', 'View'],
     content: ['Add Discussion', 'Delete', 'Permissions', 'Subscribe', 'Update', 'View'],
     file:    ['Add Discussion', 'Delete', 'Download', 'Permissions', 'Update', 'View'],
     space:   ['Add Folder', 'Delete', 'Permissions', 'Update', 'View', 'View Members']
@@ -590,7 +596,8 @@
       existing: null, def: null,
       type: 'content', restore: 'Restore from Parent', rows: ['item'],
       page: { title: 'Permissions: Retiro Park', path: 'Basic Web Content · Madrid / Contents / Parent', back: 'Back to Parent',
-              text: 'Who can see and change this content.', sections: ['perms'], aside: 'item' }
+              text: 'Who can see and change this content.', aside: 'item',
+              scopes: [['content', 'This content', 'Who can see and change this content.']] }
     },
     folder: {
       icon: '#folder', name: 'Child', path: 'Folder · Madrid / Contents / Parent',
@@ -600,12 +607,17 @@
       type: 'folder', types: ['folder', 'content'], restore: 'Restore from Parent', rows: ['folder'],
       // Tab names say whose permissions they are: the folder's own (with its subfolders) or what the items inside get
       tabLabels: { folder: 'This folder and subfolders', content: 'Contents inside', file: 'Files inside' },
-      page: { title: 'Folder Settings: Child', path: 'Madrid / Contents / Parent', back: 'Back to Parent',
+      page: { title: 'Folder Settings: Child', permsTitle: 'Permissions: Child', path: 'Madrid / Contents / Parent', back: 'Back to Parent',
+              // Permissions page: one entry per scope, the folder itself first, then what is inside it
+              scopes: [['folder', 'This folder', 'Applies to this folder only.'],
+                       ['subfolder', 'Subfolders', 'Applies to the subfolders inside, at any depth. New subfolders also get these.'],
+                       ['content', 'Contents', 'Applies to the contents inside, at any depth. New contents also get these.']],
+              settings: true, permsSaveMsg: 'Saved. Child is updated, and new items created inside will get these permissions. Existing items did not change.',
               text: 'Who can do what in this folder and inside it. Each tab says what it applies to. Saving also sets what new items created inside get.',
-              sections: ['general', 'perms', 'values'], aside: 'inside',
+              sections: ['general', 'values'], aside: 'inside',
               inside: { title: 'Inside this folder', stats: [['Subfolders', 1], ['Contents', 3]], follow: 2, custom: 2, noun: 'folder' },
               total: 4, custom: 2, applyTitle: 'Apply to items inside Child',
-              saveMsg: 'Saved. New items created in Child will use these settings. Existing items did not change.',
+              saveMsg: 'Saved. New items created in Child will use these default values. Existing items did not change.',
               general: { name: 'Child', desc: 'Guides and practical information for visitors to Madrid.' },
               fields: [
                 { id: 'city', name: 'City', mode: 'override', value: 'Madrid', parentValue: 'Madrid', origin: 'inherited' },
@@ -623,12 +635,17 @@
       def: { label: 'New items created in the space', hint: 'Default for anything created later in any folder of the space.' },
       type: 'space', types: ['space', 'folder', 'content', 'file'], restore: null, rows: [],
       tabLabels: { space: 'This space', folder: 'Folders inside', content: 'Contents inside', file: 'Files inside' },
-      page: { title: 'Space Settings: Madrid', path: 'Space · All Spaces', back: 'Back to All Spaces',
+      page: { title: 'Space Settings: Madrid', permsTitle: 'Permissions: Madrid', path: 'Space · All Spaces', back: 'Back to All Spaces',
+              scopes: [['space', 'This space', 'Applies to the space itself: who can open it, add folders and manage its members.'],
+                       ['folder', 'Folders', 'Applies to every folder in the space. New folders also get these.'],
+                       ['content', 'Contents', 'Applies to every content in the space. New contents also get these.'],
+                       ['file', 'Files', 'Applies to every file in the space. New files also get these.']],
+              settings: true, permsSaveMsg: 'Saved. Madrid is updated, and new items created in it will get these permissions. Existing items did not change.',
               text: 'Who can do what in this space and inside it. Each tab says what it applies to. Saving also sets what new items created in the space get.',
-              sections: ['general', 'perms', 'values'], aside: 'inside',
+              sections: ['general', 'values'], aside: 'inside',
               inside: { title: 'Inside this space', stats: [['Folders', 2], ['Contents', 9], ['Files', 1]], follow: 11, custom: 1, noun: 'space' },
               total: 12, custom: 1, applyTitle: 'Apply to items in Madrid',
-              saveMsg: 'Saved. New items created in Madrid will use these settings. Existing items did not change.',
+              saveMsg: 'Saved. New items created in Madrid will use these default values. Existing items did not change.',
               general: { name: 'Madrid', desc: 'Everything the city tourism team publishes about Madrid.' },
               fields: [
                 { id: 'city', name: 'City', mode: 'override', value: 'Madrid', origin: 'here' },
@@ -644,9 +661,11 @@
       base: 3, type: 'folder', types: ['folder', 'content'], restore: 'Restore selected from Parent', rows: ['folder', 'item', 'item2'],
       tabLabels: { folder: 'Selected folders and subfolders', content: 'Contents' },
       page: { title: 'Permissions: 3 items', path: 'Child, Retiro Park, San Isidro Festival · Madrid / Contents / Parent', back: 'Back to Parent',
-              text: 'Who can do what in the selected items and inside the selected folders.', sections: ['perms'], aside: 'selection',
+              text: 'Who can do what in the selected items and inside the selected folders.', aside: 'selection',
+              scopes: [['folder', 'Selected folders', 'Applies to the selected folders.'],
+                       ['content', 'Contents', 'Applies to the selected contents and the contents inside the selected folders.']],
               total: 4, custom: 1, applyTitle: 'Apply to the selected items',
-              saveMsg: 'Saved. Permissions of the 3 selected items updated.' }
+              permsSaveMsg: 'Saved. Permissions of the 3 selected items updated.' }
     }
   };
 
@@ -654,11 +673,17 @@
   var restoring = false;
   var stepMode = 'full';   // full | mark | step1
   var presentation = 'page';   // page (default) | modal
-  var section = 'perms';
+  var section = 'general';      // settings page section
+  var pageMode = 'perms';       // perms (⋮ > Permissions) | settings (⋮ > Edit / Space Settings)
+  var pageScope = 'content';    // permissions page: which scope the matrix shows
   var edits = {};              // type|role|action -> checked, only where it differs from the base
   var matrixType = 'content';
   var fields = [], baseFields = [], pool = [];
-  var TYPE_LABEL = { folder: 'folders', content: 'contents', file: 'files', space: 'space' };
+  var TYPE_LABEL = { folder: 'folders', subfolder: 'subfolders', content: 'contents', file: 'files', space: 'space' };
+  function scopeLabel(type) {
+    var sc = (VARIANTS[current].page.scopes || []).filter(function (x) { return x[0] === type; })[0];
+    return sc ? sc[1].toLowerCase() : TYPE_LABEL[type];
+  }
   var MODE_HINT = {
     override: 'Fills the field on items that leave it empty or still follow this folder.',
     append: "Added after the item's own value.",
@@ -742,9 +767,16 @@
     var v = VARIANTS[current];
     var toExisting = !!(v.existing && $('cbExisting').checked);
     var toDefault = !!(v.def && $('cbDefault').checked);
-    var propagating = toExisting || toDefault || (presentation === 'page' && !!v.types);
+    var propagating = toExisting || toDefault;
+    if (presentation === 'page') {
+      // Page: the side menu picks the scope and the section header names it, so no tabs or title row here
+      $('typeTabs').hidden = true; $('matrixTitle').hidden = true; $('tabScope').hidden = true;
+      renderMatrix(pageScope);
+      propagating = null;
+    }
 
     // Propagating means several item types at once → one matrix per type, switched by tabs
+    if (propagating !== null) {
     $('typeTabs').hidden = !propagating;
     $('matrixTitle').hidden = propagating;
     $('tabScope').hidden = !propagating;
@@ -770,6 +802,7 @@
       renderMatrix(activeType);
     } else {
       renderMatrix(v.type);
+    }
     }
 
     $('subExisting').hidden = !toExisting;
@@ -820,6 +853,7 @@
     edits = {};
     var v = VARIANTS[key];
     fields = clone(v.page && v.page.fields); baseFields = clone(fields); pool = clone(v.page && v.page.pool);
+    pageScope = v.page.scopes[0][0]; section = 'general';
     if (presentation === 'page') withFlash = false;
 
     // Context row
@@ -877,7 +911,9 @@
       var on = b.getAttribute('data-presentation') === p;
       b.classList.toggle('is-active', on); b.setAttribute('aria-pressed', on ? 'true' : 'false');
     });
-    $('protoHint').textContent = 'The same Permissions entry opens in every case. Only the ' + (p === 'page' ? 'page' : 'modal') + ' changes.';
+    $('protoHint').textContent = p === 'page'
+      ? 'Every entity has its own Permissions page. Edit / Settings keeps General and Default Values.'
+      : 'The same Permissions entry opens in every case. Only the modal changes.';
     if (p === 'page') {
       $('pagePermBar').appendChild(nodeOrigin);
       $('pagePermBar').appendChild(nodeRestore);
@@ -901,10 +937,27 @@
 
   function renderNav() {
     var v = VARIANTS[current];
-    var single = v.page.sections.length === 1;   // a nav with one entry adds nothing
+    if (pageMode === 'perms') {
+      var scopes = v.page.scopes, sc = scopes.filter(function (x) { return x[0] === pageScope; })[0] || scopes[0];
+      var one = scopes.length === 1;   // a nav with one entry adds nothing
+      $('pageView').classList.toggle('page--single', one);
+      document.querySelector('.page__nav').hidden = one;
+      $('pageNav').setAttribute('aria-label', 'Permission scopes');
+      $('pageNav').innerHTML = scopes.map(function (x) {
+        var on = x[0] === pageScope;
+        return '<li class="vert-nav__item' + (on ? ' is-active' : '') + '" role="link" tabindex="0" data-scope="' + x[0] + '"' + (on ? ' aria-current="page"' : '') + '>' + x[1] + '</li>';
+      }).join('');
+      $('pageSecPerms').hidden = false; $('pageSecValues').hidden = true; $('pageSecGeneral').hidden = true;
+      $('pageSecPermsTitle').textContent = one ? 'Permissions' : sc[1];
+      $('pagePermsText').textContent = one ? v.page.text : sc[2];
+      return;
+    }
+    $('pageNav').setAttribute('aria-label', 'Settings sections');
+    if (stepMode === 'step1' && section === 'values') section = 'general';   // Default Values is not part of step 1
+    var visible = v.page.sections.filter(function (id) { return !(stepMode === 'step1' && id === 'values'); });
+    var single = visible.length === 1;
     $('pageView').classList.toggle('page--single', single);
     document.querySelector('.page__nav').hidden = single;
-    if (stepMode === 'step1' && section === 'values') section = 'perms';   // Default Values is not part of step 1
     $('pageNav').innerHTML = v.page.sections.map(function (id) {
       var m = SECTION_META[id];
       var step = id === 'values' ? ' data-step="2"' : '';
@@ -957,7 +1010,7 @@
   function permChanges() {
     var out = Object.keys(edits).map(function (k) {
       var p = k.split('|');
-      return p[1] + (edits[k] ? ' can now ' : ' can no longer ') + p[2] + ' (' + TYPE_LABEL[p[0]] + ')';
+      return p[1] + (edits[k] ? ' can now ' : ' can no longer ') + p[2] + ' (' + scopeLabel(p[0]) + ')';
     });
     if (restoring) out.unshift('Restored from Parent');
     return out;
@@ -982,14 +1035,14 @@
         '<li>Retiro Park <span class="label label--sm label--success">Inherited</span></li>' +
         '<li>San Isidro Festival <span class="label label--sm label--success">Inherited</span></li></ul></div>';
     }
-    var vc = valueChanges(), pc = permChanges();
+    var vc = pageMode === 'settings' ? valueChanges() : [], pc = pageMode === 'perms' ? permChanges() : [];
     html += '<div class="aside-block"><h3 class="aside-block__title">Unsaved changes</h3>' +
       (vc.length + pc.length === 0 ? '<p class="aside-text">Nothing changed yet.</p>' :
         (pc.length ? '<p class="aside-text"><strong>Permissions</strong></p><ul class="aside-list">' + pc.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>' : '') +
         (vc.length ? '<p class="aside-text"><strong>Default values</strong></p><ul class="aside-list">' + vc.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>' : '')) +
       '</div>';
     $('pageAside').innerHTML = html;
-    if ($('pageNav').children.length) renderNavMetaOnly();
+    if (pageMode === 'settings' && $('pageNav').children.length) renderNavMetaOnly();
   }
   function renderNavMetaOnly() {
     $('pageNav').querySelectorAll('[data-section]').forEach(function (li) {
@@ -999,18 +1052,25 @@
 
   function renderPage() {
     var v = VARIANTS[current], pg = v.page;
-    if (pg.sections.indexOf(section) < 0) section = 'perms';
-    $('pageTitle').textContent = pg.title;
+    if (!pg.settings) pageMode = 'perms';
+    if (pageMode === 'settings' && pg.sections.indexOf(section) < 0) section = 'general';
+    $('pageTitle').textContent = pageMode === 'perms' ? (pg.permsTitle || pg.title) : pg.title;
     $('pagePath').textContent = pg.path;
     $('pageBack').setAttribute('aria-label', pg.back);
     var st = $('pageSticker');
     st.className = v.initials ? 'sticker sticker--outline sticker--primary sticker--md' : 'sticker sticker--icon sticker--md';
     st.innerHTML = v.initials ? v.initials : '<svg class="lexicon-icon"><use href="' + v.icon + '"></use></svg>';
     $('pagePermsText').textContent = pg.text;
-    $('pageApply').hidden = !pg.total;
+    var canApply = !!pg.total && (pageMode === 'perms' || (pg.fields && pg.fields.length));
+    $('pageApply').hidden = !canApply;
     // Without "Save and Apply to Items", Save is the page's main action
-    $('pageSave').classList.toggle('btn--primary', !pg.total);
-    $('pageSave').classList.toggle('btn--secondary', !!pg.total);
+    $('pageSave').classList.toggle('btn--primary', !canApply);
+    $('pageSave').classList.toggle('btn--secondary', canApply);
+    // Entry point radios in the prototype panel: content and multi-selection only have ⋮ > Permissions
+    document.querySelectorAll('[data-entry]').forEach(function (r) {
+      r.checked = r.getAttribute('data-entry') === pageMode;
+      if (r.getAttribute('data-entry') === 'settings') r.disabled = !pg.settings;
+    });
     if (pg.general) { $('genName').value = pg.general.name; $('genDesc').value = pg.general.desc; }
     renderNav();
     renderFields();
@@ -1021,8 +1081,12 @@
   var include = { values: true, perms: true };
   function renderApply() {
     var v = VARIANTS[current], pg = v.page;
-    var vc = valueChanges(), pc = permChanges();
-    $('applyTitle').textContent = pg.applyTitle;
+    var vc = pageMode === 'settings' ? valueChanges() : [], pc = pageMode === 'perms' ? permChanges() : [];
+    $('applyTitle').textContent = (pageMode === 'perms' ? 'Apply permissions' : 'Apply default values') + pg.applyTitle.replace(/^Apply/, '');
+    $('applyEmpty').textContent = pageMode === 'perms' ? 'No changes yet. Edit a permission first.' : 'No changes yet. Edit a default value first.';
+    $('applyNote').textContent = pageMode === 'perms'
+      ? 'Changes run in the background and apply directly. Permission changes never create drafts. You need permission to update every item affected.'
+      : "Changes run in the background and follow each item's workflow, so published items become drafts until approved. You need permission to update every item affected.";
     $('applyEmpty').hidden = vc.length + pc.length > 0;
     var groups = [];
     if (pc.length) groups.push(['perms', 'Permissions (' + pc.length + ')', pc]);
@@ -1081,6 +1145,10 @@
       lockHeight();
       return;
     }
+    if (r.hasAttribute('data-entry')) {
+      pageMode = r.getAttribute('data-entry'); renderPage(); updateTabsAndFooter();
+      return;
+    }
     if (!r.hasAttribute('data-variant')) return;
     applyVariant(r.getAttribute('data-variant'), true);
   });
@@ -1112,15 +1180,19 @@
     var b = e.target.closest('[data-presentation]'); if (!b || b.getAttribute('data-presentation') === presentation) return;
     setPresentation(b.getAttribute('data-presentation'));
   });
+  function pickNav(li) {
+    if (li.hasAttribute('data-scope')) { pageScope = li.getAttribute('data-scope'); renderNav(); updateTabsAndFooter(); }
+    else { section = li.getAttribute('data-section'); renderNav(); }
+  }
   $('pageNav').addEventListener('click', function (e) {
-    var li = e.target.closest('[data-section]'); if (!li) return;
-    section = li.getAttribute('data-section'); renderNav();
+    var li = e.target.closest('[data-scope], [data-section]'); if (li) pickNav(li);
   });
   $('pageNav').addEventListener('keydown', function (e) {
     if (e.key !== 'Enter' && e.key !== ' ') return;
-    var li = e.target.closest('[data-section]'); if (!li) return;
-    e.preventDefault(); section = li.getAttribute('data-section'); renderNav();
-    $('pageNav').querySelector('[data-section="' + section + '"]').focus();
+    var li = e.target.closest('[data-scope], [data-section]'); if (!li) return;
+    e.preventDefault(); pickNav(li);
+    var sel = li.hasAttribute('data-scope') ? '[data-scope="' + pageScope + '"]' : '[data-section="' + section + '"]';
+    $('pageNav').querySelector(sel).focus();
   });
   $('matrixHost').addEventListener('change', function (e) {
     var cb = e.target.closest('.checkbox__input'); if (!cb) return;
@@ -1163,7 +1235,7 @@
   $('pageCancel').addEventListener('click', function () { applyVariant(current); });
   $('pageSave').addEventListener('click', function () {
     var pg = VARIANTS[current].page;
-    var msg = pg.saveMsg || ('Saved. Permissions of ' + VARIANTS[current].name + ' updated.');
+    var msg = pageMode === 'perms' ? (pg.permsSaveMsg || ('Saved. Permissions of ' + VARIANTS[current].name + ' updated.')) : pg.saveMsg;
     applyVariant(current); toast(msg);
   });
   $('pageApply').addEventListener('click', openApply);
