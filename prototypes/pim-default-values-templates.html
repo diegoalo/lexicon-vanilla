@@ -312,7 +312,7 @@
     if (f.kind === 'text') return '';
     var modes = f.kind === 'list' ? [['add', 'Add to Entry Values'], ['replace', 'Replace']] : [['value', 'Value'], ['template', 'Template']];
     return '<div class="field-row__mode"><span class="field-row__hint">Applies as</span><div class="btn-group" role="group" aria-label="How ' + esc(f.name) + ' applies">' + modes.map(function (m) {
-      return '<button class="btn btn--secondary btn--sm' + (f.mode === m[0] ? ' is-active' : '') + '" type="button" data-mode="' + m[0] + '" data-fid="' + f.id + '" aria-pressed="' + (f.mode === m[0]) + '">' + m[1] + '</button>';
+      return '<button class="btn btn--secondary btn--xs' + (f.mode === m[0] ? ' is-active' : '') + '" type="button" data-mode="' + m[0] + '" data-fid="' + f.id + '" aria-pressed="' + (f.mode === m[0]) + '">' + m[1] + '</button>';
     }).join('') + '</div><span class="field-row__hint">' + MODE_HINT[f.mode] + '</span></div>';
   }
   function listInput(f) {
