@@ -268,8 +268,23 @@
     var f = byId(key);
     return f ? f.value : '';
   }
+  // The result is tidied: repeated separators (for example "– –" left by an empty field) become one, and stray ones at the ends go
+  var SEP = '[–—\\-,|/]';
   function compose(parts, e) {
-    return parts.map(function (p) { return p.f ? fieldValue(e, p.f) : p.t; }).join('').replace(/\s+/g, ' ').trim();
+    return parts.map(function (p) { return p.f ? fieldValue(e, p.f) : p.t; }).join('')
+      .replace(/\s+/g, ' ')
+      .replace(new RegExp('\\s*(' + SEP + ')(?:\\s*' + SEP + ')+\\s*', 'g'), ' $1 ')
+      .replace(new RegExp('^(?:\\s|' + SEP + ')+|(?:\\s|' + SEP + ')+$', 'g'), '')
+      .replace(/\s+/g, ' ').trim();
+  }
+  function duplicates(parts) {
+    var seen = {}, dup = [];
+    parts.forEach(function (p) { if (p.f) { if (seen[p.f] && dup.indexOf(p.f) < 0) dup.push(p.f); seen[p.f] = true; } });
+    return dup;
+  }
+  function dupText(parts) {
+    var d = duplicates(parts);
+    return d.length ? '<strong>Warning:</strong> ' + d.map(attrLabel).join(', ') + (d.length > 1 ? ' are' : ' is') + ' used more than once.' : '';
   }
   function tokenHtml(k, removable) {
     return '<span class="label label--sm" contenteditable="false" data-key="' + k + '">' + esc(attrLabel(k)) +
@@ -314,12 +329,14 @@
     }).join('');
   }
   function templateBlock(f) {
-    return '<div class="tpl__bar">' +
+    var dt = dupText(f.parts);
+    return '<div class="input' + (dt ? ' input--warning' : '') + '" id="tplWrap-' + f.id + '"><div class="tpl__bar">' +
       '<div class="multi-select tpl__editor" contenteditable="true" role="textbox" aria-multiline="false" aria-label="' + esc(f.name) + ' template" id="fld-' + f.id + '" data-tpl="' + f.id + '" data-placeholder="Type text and insert fields">' + partsHtml(f.parts, true) + '</div>' +
       '<div class="tpl__insert" id="ins-' + f.id + '"><button class="btn btn--secondary btn--sm" type="button" data-insert-toggle="' + f.id + '" aria-haspopup="menu" aria-expanded="false"><svg class="lexicon-icon"><use href="#plus"></use></svg> Insert Field</button>' +
       '<ul class="dropdown" role="menu">' + ATTRS.map(function (a) {
         return '<li><button class="dropdown__item" role="menuitem" type="button" data-insert="' + a.key + '" data-fid="' + f.id + '"><span class="dropdown__item-text">' + a.label + '</span></button></li>';
       }).join('') + '</ul></div></div>' +
+      '<span class="input__feedback" id="tplWarn-' + f.id + '"' + (dt ? '' : ' hidden') + '><svg class="lexicon-icon"><use href="#warning-full"></use></svg><span>' + dt + '</span></span></div>' +
       '<div class="tpl__preview"><span class="field-row__hint">Preview: what each product gets</span>' +
       '<table class="table"><thead><tr><th>Product</th><th>' + esc(f.name) + '</th></tr></thead><tbody id="prev-' + f.id + '">' + previewRows(f) + '</tbody></table></div>';
   }
@@ -365,8 +382,13 @@
   }
 
   function syncTemplate(fid) {
-    byId(fid).parts = parseEditor($('fld-' + fid));
-    $('prev-' + fid).innerHTML = previewRows(byId(fid));
+    var f = byId(fid), dt;
+    f.parts = parseEditor($('fld-' + fid));
+    dt = dupText(f.parts);
+    $('tplWrap-' + fid).classList.toggle('input--warning', !!dt);
+    $('tplWarn-' + fid).hidden = !dt;
+    $('tplWarn-' + fid).querySelector('span').innerHTML = dt;
+    $('prev-' + fid).innerHTML = previewRows(f);
   }
 
   // Caret inside a template editor, so "Insert Field" drops the label where the user was typing
