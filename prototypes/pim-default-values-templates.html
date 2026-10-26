@@ -138,9 +138,9 @@
     <aside class="page__aside" aria-label="Summary">
       <div class="aside-block">
         <h3 class="aside-block__title">Inside this folder</h3>
-        <div class="aside-stat"><span>Entries</span><strong>3</strong></div>
-        <div class="aside-stat"><span>Follow all values</span><strong>2</strong></div>
-        <div class="aside-stat"><span>Own Web Title (B2B)</span><strong>1</strong></div>
+        <div class="aside-stat"><span>Entries</span><strong id="statEntries">3</strong></div>
+        <div class="aside-stat"><span>Follow all values</span><strong id="statFollow">2</strong></div>
+        <div class="aside-stat"><span>Own Web Title (B2B)</span><strong id="statOwn">1</strong></div>
       </div>
       <div class="aside-block">
         <h3 class="aside-block__title">How templates work</h3>
@@ -162,7 +162,7 @@
       <span class="sticker sticker--icon sticker--md"><svg class="lexicon-icon"><use href="#catalog"></use></svg></span>
       <div class="page__title-text">
         <h1 class="page__title">Edit SUN-SPF50-SENS-SPR-050</h1>
-        <span class="page__path">Sun Care / Sunscreen / SPF 50+ / Sensitive skin / Spray</span>
+        <span class="page__path" id="entryPath">Sun Care / Sunscreen / SPF 50+ / Sensitive skin / Spray</span>
       </div>
     </div>
     <div class="page__actions">
@@ -181,6 +181,7 @@
     <main class="page__main">
       <div class="portlet-body"><div class="container-fluid-max-xl">
         <section class="page-section" aria-label="Details">
+          <div id="entryNotice"></div>
           <div class="field-list" id="entryFields"></div>
         </section>
       </div></div>
@@ -213,7 +214,10 @@
     <span class="proto-panel__hint">Screen</span>
     <label class="radio"><input type="radio" name="screen" class="radio__input" data-screen="folder" checked><span class="radio__box"></span><span class="radio__label">Folder settings</span></label>
     <label class="radio"><input type="radio" name="screen" class="radio__input" data-screen="entry"><span class="radio__box"></span><span class="radio__label">Entry inside it</span></label>
-    <span class="proto-panel__hint">Simple fields take a value. Composed fields can use a template: type text and insert fields; the preview updates as you type.</span>
+    <span class="proto-panel__hint">Try a case</span>
+    <button class="btn btn--secondary btn--xs" type="button" data-case="rename">Seasonal rename in Spray</button>
+    <button class="btn btn--secondary btn--xs" type="button" data-case="move">Move 50 ml to Lotion</button>
+    <button class="btn btn--borderless btn--xs" type="button" data-case="reset">Start again</button>
   </div>
 </aside>
 
@@ -230,7 +234,8 @@
     { key: 'skin_type', label: 'Skin Type' },
     { key: 'format', label: 'Format' },
     { key: 'volume', label: 'Volume' },
-    { key: 'description', label: 'Description' }
+    { key: 'description', label: 'Description' },
+    { key: 'note', label: 'Title Note' }
   ];
   var attrLabel = function (k) { return (ATTRS.find(function (a) { return a.key === k; }) || { label: k }).label; };
 
@@ -243,17 +248,22 @@
     { id: 'format', name: 'Format', kind: 'text', value: 'Spray' },
     { id: 'tags', name: 'Tags', kind: 'list', mode: 'add', value: ['Sun care', 'Sensitive skin'], origin: 'Sensitive skin' },
     { id: 'web_title', name: 'Web Title (B2B)', kind: 'composed', mode: 'template', value: '',
-      parts: [{ f: 'product_line' }, { t: ' ' }, { f: 'spf' }, { t: ' – ' }, { f: 'skin_type' }, { t: ' – ' }, { f: 'format' }, { t: ' – ' }, { f: 'volume' }] },
+      parts: [{ f: 'product_line' }, { t: ' ' }, { f: 'spf' }, { t: ' – ' }, { f: 'skin_type' }, { t: ' – ' }, { f: 'format' }, { t: ' – ' }, { f: 'volume' }, { t: ' – ' }, { f: 'note' }] },
     { id: 'web_desc', name: 'Web Description (B2B)', kind: 'composed', mode: 'template', value: '',
       parts: [{ f: 'description' }, { t: ' Dermatologically tested. Safety data sheet available on request.' }] }
   ];
 
   // Entries inside Spray, with their own values. The 200 ml one wrote its own Web Title.
   var entries = [
-    { sku: 'SUN-SPF50-SENS-SPR-050', name: 'Sunscreen Spray 50 ml', volume: '50 ml', description: 'Very high protection for sensitive skin.', tags: ['Travel size'], own: {} },
-    { sku: 'SUN-SPF50-SENS-SPR-150', name: 'Sunscreen Spray 150 ml', volume: '150 ml', description: 'Very high protection for sensitive skin.', tags: [], own: {} },
-    { sku: 'SUN-SPF50-SENS-SPR-200', name: 'Sunscreen Spray 200 ml', volume: '200 ml', description: 'Very high protection for sensitive skin.', tags: ['Family size'], own: { web_title: 'Sunscreen SPF 50+ Spray, family size 200 ml' } }
+    { sku: 'SUN-SPF50-SENS-SPR-050', folder: 'Spray', note: 'Travel size', name: 'Sunscreen Spray 50 ml', volume: '50 ml', description: 'Very high protection for sensitive skin.', tags: ['Travel size'], own: {} },
+    { sku: 'SUN-SPF50-SENS-SPR-150', folder: 'Spray', note: '', name: 'Sunscreen Spray 150 ml', volume: '150 ml', description: 'Very high protection for sensitive skin.', tags: [], own: {} },
+    { sku: 'SUN-SPF50-SENS-SPR-200', folder: 'Spray', note: '', name: 'Sunscreen Spray 200 ml', volume: '200 ml', description: 'Very high protection for sensitive skin.', tags: ['Family size'], own: { web_title: 'Sunscreen SPF 50+ Spray, family size 200 ml' } }
   ];
+
+  // Sibling folder under Sensitive skin. Same template (both inherit it), its own Format and Tags.
+  var LOTION = { format: 'Lotion', tags: ['Sun care', 'Sensitive skin', 'Body'], parts: {} };
+  fields.forEach(function (f) { if (f.parts) LOTION.parts[f.id] = JSON.parse(JSON.stringify(f.parts)); });
+  var tplFor = function (e, f) { return e.folder === 'Lotion' ? LOTION.parts[f.id] : f.parts; };
 
   var MODE_HINT = {
     value: 'Entries that leave this field empty, or still follow this folder, get this value.',
@@ -265,9 +275,11 @@
 
   function fieldValue(e, key) {
     if (e[key] !== undefined) return e[key];
+    if (e.folder === 'Lotion' && LOTION[key] !== undefined) return LOTION[key];
     var f = byId(key);
     return f ? f.value : '';
   }
+  var inSpray = function () { return entries.filter(function (e) { return e.folder === 'Spray'; }); };
   // The result is tidied: repeated separators (for example "– –" left by an empty field) become one, and stray ones at the ends go
   var SEP = '[–—\\-,|/]';
   function compose(parts, e) {
@@ -321,7 +333,7 @@
     }).join('') + '<input class="multi-select__input" type="text" aria-label="Add ' + esc(f.name) + '"></div>';
   }
   function previewRows(f) {
-    return entries.map(function (e) {
+    return inSpray().map(function (e) {
       var own = e.own[f.id];
       return '<tr><td>' + esc(e.sku) + '</td><td>' + (own
         ? esc(own) + ' <span class="label label--sm label--warning">Own value</span>'
@@ -342,6 +354,7 @@
   }
 
   function renderFolder() {
+    renderStats();
     $('folderFields').innerHTML = fields.map(function (f) {
       var body = f.kind === 'list' ? listInput(f)
         : f.mode === 'template' ? templateBlock(f)
@@ -354,31 +367,49 @@
   }
 
   function renderEntry() {
-    var e = entries[0];
+    var e = entries[0], folder = e.folder;
     var row = function (label, html, extra) {
       return '<div class="field-row"><div class="field-row__head"><span class="input__label">' + label + '</span>' + (extra || '') + '</div>' + html + '</div>';
     };
     var input = function (v, ro) { return '<input class="input__field" type="text" value="' + esc(v) + '"' + (ro ? ' readonly' : '') + '>'; };
-    var html = row('Name', input(e.name)) + row('Volume', input(e.volume)) + row('Description', '<textarea class="input__field input__field--textarea" rows="2">' + esc(e.description) + '</textarea>');
+    var inh = function (from) { return '<span class="label label--sm label--success">Inherited from ' + esc(from) + '</span>'; };
+    $('entryPath').textContent = 'Sun Care / Sunscreen / SPF 50+ / Sensitive skin / ' + folder;
+    $('entryNotice').innerHTML = e.moved
+      ? '<div class="alert alert--simple alert--info"><div class="alert__content"><svg class="lexicon-icon"><use href="#info-circle"></use></svg><p class="alert__text"><strong>Moved from Spray to Lotion.</strong> Format, Tags and Web Title (B2B) now follow Lotion. Your own values (Volume, Title Note and the tags you added) were kept.</p></div></div>'
+      : '';
+    var html = row('Name', input(e.name)) + row('Volume', input(e.volume)) +
+      row('Title Note', input(e.note) + '<span class="input__help">Your own text for the title, such as an edition or a pack size. The template adds it where the folder places it.</span>') +
+      row('Description', '<textarea class="input__field input__field--textarea" rows="2">' + esc(e.description) + '</textarea>');
     fields.forEach(function (f) {
       if (f.kind === 'list') {
-        var all = f.value.concat(e.tags);
-        html += row(f.name, '<div class="multi-select">' + all.map(function (v) { return '<span class="label label--sm">' + esc(v) + '</span>'; }).join('') + '<input class="multi-select__input" type="text" aria-label="Add tags"></div>' +
-          '<span class="input__help">' + esc(f.value.join(', ')) + ' added by folder Spray. ' + esc(e.tags.join(', ')) + ' set on this entry.</span>');
+        var mine = folder === 'Lotion' ? LOTION.tags : f.value;
+        html += row(f.name, '<div class="multi-select">' + mine.concat(e.tags).map(function (v) { return '<span class="label label--sm">' + esc(v) + '</span>'; }).join('') + '<input class="multi-select__input" type="text" aria-label="Add tags"></div>' +
+          '<span class="input__help">' + esc(mine.join(', ')) + ' added by folder ' + folder + '. ' + esc(e.tags.join(', ')) + ' set on this entry.</span>');
       } else if (f.kind === 'composed' && f.mode === 'template') {
         var own = e.own[f.id];
-        html += row(f.name, input(own || compose(f.parts, e), !own) +
-          '<span class="input__help tpl__inline">' + (own ? 'Your own value. The folder template is not applied.' : 'Built by the template in folder Spray: ' + partsHtml(f.parts, false)) + '</span>',
+        html += row(f.name, input(own || compose(tplFor(e, f), e), !own) +
+          '<span class="input__help tpl__inline">' + (own ? 'Your own value. The folder template is not applied.' : 'Built by the template in folder ' + folder + ': ' + partsHtml(tplFor(e, f), false)) + '</span>',
           (own ? '<span class="label label--sm label--warning">Own value</span><span class="field-row__spacer"></span><button class="btn btn--borderless btn--sm" type="button" data-reset="' + f.id + '"><svg class="lexicon-icon"><use href="#restore"></use></svg> Use Template</button>'
                : '<span class="label label--sm label--info">From template</span><span class="field-row__spacer"></span><button class="btn btn--borderless btn--sm" type="button" data-own="' + f.id + '"><svg class="lexicon-icon"><use href="#pencil"></use></svg> Write My Own</button>'));
+      } else if (f.id === 'format') {
+        html += row(f.name, input(fieldValue(e, 'format')), inh(folder));
       } else {
-        html += row(f.name, input(f.value), '<span class="label label--sm label--success">Inherited from ' + esc(f.origin || 'Spray') + '</span>');
+        html += row(f.name, input(f.value), inh(f.origin || folder));
       }
     });
     $('entryFields').innerHTML = html;
     var owns = Object.keys(e.own).length;
     $('entryFollow').className = 'label label--sm ' + (owns ? 'label--warning' : 'label--success');
     $('entryFollow').textContent = owns ? owns + ' own value' : 'All follow the folder';
+    document.querySelector('#entryView .aside-block__title').textContent = 'From folder ' + folder;
+    document.querySelector('#entryView [data-go]').textContent = 'Open ' + folder + ' settings';
+  }
+
+  function renderStats() {
+    var list = inSpray();
+    $('statEntries').textContent = list.length;
+    $('statFollow').textContent = list.filter(function (e) { return !Object.keys(e.own).length; }).length;
+    $('statOwn').textContent = list.filter(function (e) { return e.own.web_title; }).length;
   }
 
   function syncTemplate(fid) {
@@ -440,8 +471,19 @@
       el.focus(); var sel = document.getSelection(); sel.removeAllRanges(); sel.addRange(nr);
       syncTemplate(d.fid);
       $('ins-' + d.fid).classList.remove('is-open'); $('ins-' + d.fid).querySelector('[data-insert-toggle]').setAttribute('aria-expanded', 'false');
+    } else if (d.case === 'rename') {
+      var wt = byId('web_title');
+      if (!(wt.parts[0] && wt.parts[0].t === 'Christmas Edition – ')) wt.parts.unshift({ t: 'Christmas Edition – ' });
+      show('folder');
+      var upd = inSpray().filter(function (e) { return !e.own.web_title; }).length, kept = inSpray().length - upd;
+      toast('Spray template changed. ' + upd + ' products updated' + (kept ? ', ' + kept + ' keeps its own Web Title (B2B)' : '') + '. Their Title Notes were kept.');
+    } else if (d.case === 'move') {
+      entries[0].folder = 'Lotion'; entries[0].moved = true; $('toastHost').hidden = true;
+      show('entry');
+    } else if (d.case === 'reset') {
+      location.reload();
     } else if (d.own) {
-      entries[0].own[d.own] = compose(byId(d.own).parts, entries[0]); renderEntry();
+      entries[0].own[d.own] = compose(tplFor(entries[0], byId(d.own)), entries[0]); renderEntry();
     } else if (d.reset) {
       delete entries[0].own[d.reset]; renderEntry();
     } else if (d.go) {
