@@ -49,6 +49,13 @@
     .field-row__head .input__label { margin: 0; }
     .field-row__spacer { flex: 1 1 auto; }
     .field-row__mode { display: flex; align-items: center; gap: var(--spacing-3); flex-wrap: wrap; }
+    .dv-group { display: flex; flex-direction: column; gap: var(--spacing-5); padding-top: var(--spacing-5); border-top: 1px solid var(--color-secondary-l3); }
+    .dv-group__title { margin: 0; font-size: var(--font-size-base); font-weight: var(--font-weight-bold); color: var(--color-dark); }
+    .dv-inherited td { vertical-align: middle; }
+    .dv-inherited td:last-child { text-align: right; white-space: nowrap; }
+    .dv-inherited .lexicon-icon { vertical-align: middle; margin-right: var(--spacing-2); opacity: 0.7; }
+    .dv-inherited .field-row__hint { margin-left: var(--spacing-2); }
+    .dv-inherited .label { margin-right: var(--spacing-1); }
     .field-row__hint { font-size: var(--font-size-sm); color: var(--color-dark); opacity: 0.7; }
     .aside-block { display: flex; flex-direction: column; gap: var(--spacing-3); padding: var(--spacing-5); border: 1px solid var(--color-secondary-l3); border-radius: var(--rounded-md); }
     .aside-block__title { margin: 0; font-size: var(--font-size-xs); font-weight: var(--font-weight-bold); text-transform: uppercase; letter-spacing: 0.04em; color: var(--color-dark); opacity: 0.7; }
@@ -130,8 +137,24 @@
             <h2 class="page-section__title" id="dvTitle">Default Values</h2>
             <p class="page-section__text">Values the entries inside start with, at any depth. A field takes a fixed value. Composed fields, such as channel titles, can use a template built from other fields. An entry that changes a field gets its own value for it.</p>
           </div>
-          <div class="field-list" id="folderFields"></div>
-          <div><button class="btn btn--secondary btn--sm" type="button"><svg class="lexicon-icon"><use href="#plus"></use></svg> Add Field</button></div>
+          <div class="dv-group">
+            <div class="page-section__head">
+              <h3 class="dv-group__title">Inherited from Parent Folders</h3>
+              <p class="page-section__text">Spray gets these values from the folders above and passes them on. Override one to give Spray and its entries a different value.</p>
+            </div>
+            <table class="table dv-inherited">
+              <thead><tr><th>Field</th><th>Value</th><th>Set in Folder</th><th aria-label="Actions"></th></tr></thead>
+              <tbody id="inheritedRows"></tbody>
+            </table>
+          </div>
+          <div class="dv-group">
+            <div class="page-section__head">
+              <h3 class="dv-group__title">Set in This Folder</h3>
+              <p class="page-section__text">Values Spray adds on top, for every entry inside and its subfolders.</p>
+            </div>
+            <div class="field-list" id="folderFields"></div>
+            <div><button class="btn btn--secondary btn--sm" type="button"><svg class="lexicon-icon"><use href="#plus"></use></svg> Add Field</button></div>
+          </div>
         </section>
       </div></div>
     </main>
@@ -272,12 +295,18 @@
     replace: 'Replaces the entry\'s own values.'
   };
   var byId = function (id) { return fields.find(function (x) { return x.id === id; }); };
+  // A value from a parent folder, not overridden in Spray
+  var isInherited = function (f) { return f.origin && !f.overridden; };
+  var clone = function (v) { return JSON.parse(JSON.stringify(v)); };
+  // Folder that sets the value an entry gets
+  var sourceOf = function (f, folder) { return f.origin && (folder === 'Lotion' || !f.overridden) ? f.origin : folder; };
 
   function fieldValue(e, key) {
     if (e[key] !== undefined) return e[key];
     if (e.folder === 'Lotion' && LOTION[key] !== undefined) return LOTION[key];
     var f = byId(key);
-    return f ? f.value : '';
+    if (!f) return '';
+    return e.folder === 'Lotion' && f.overridden ? f.inheritedValue : f.value;
   }
   var inSpray = function () { return entries.filter(function (e) { return e.folder === 'Spray'; }); };
   // The result is tidied: repeated separators (for example "– –" left by an empty field) become one, and stray ones at the ends go
@@ -318,7 +347,7 @@
   }
   function chip(f) {
     if (f.mode === 'template') return '<span class="label label--sm label--info">Template</span>';
-    return f.origin ? '<span class="label label--sm label--success">Inherited from ' + esc(f.origin) + '</span>' : '<span class="label label--sm label--secondary">Set here</span>';
+    return f.overridden ? '<span class="label label--sm label--warning">Overrides folder ' + esc(f.origin) + '</span>' : '';
   }
   function modeRow(f) {
     if (f.kind === 'text') return '';
@@ -355,14 +384,24 @@
 
   function renderFolder() {
     renderStats();
-    $('folderFields').innerHTML = fields.map(function (f) {
+    $('folderFields').innerHTML = fields.filter(function (f) { return !isInherited(f); }).map(function (f) {
       var body = f.kind === 'list' ? listInput(f)
         : f.mode === 'template' ? templateBlock(f)
-        : '<input class="input__field" type="text" id="fld-' + f.id + '" value="' + esc(f.value) + '">';
+        : '<input class="input__field" type="text" id="fld-' + f.id + '" data-val="' + f.id + '" value="' + esc(f.value) + '">';
+      var action = f.overridden
+        ? '<button class="btn btn--borderless btn--sm" type="button" data-inherit="' + f.id + '"><svg class="lexicon-icon"><use href="#restore"></use></svg> Use Inherited</button>'
+        : '<button class="btn btn--borderless btn--sm btn--icon" type="button" aria-label="Remove ' + esc(f.name) + '"><svg class="lexicon-icon"><use href="#times"></use></svg></button>';
       return '<div class="field-row">' +
         '<div class="field-row__head"><label class="input__label" for="fld-' + f.id + '">' + esc(f.name) + '</label>' + chip(f) +
-        '<span class="field-row__spacer"></span><button class="btn btn--borderless btn--sm btn--icon" type="button" aria-label="Remove ' + esc(f.name) + '"><svg class="lexicon-icon"><use href="#times"></use></svg></button></div>' +
+        '<span class="field-row__spacer"></span>' + action + '</div>' +
         modeRow(f) + body + '</div>';
+    }).join('');
+    $('inheritedRows').innerHTML = fields.filter(isInherited).map(function (f) {
+      var val = f.kind === 'list'
+        ? f.value.map(function (v) { return '<span class="label label--sm">' + esc(v) + '</span>'; }).join('') + '<span class="field-row__hint">' + (f.mode === 'add' ? 'Added to entry values' : 'Replaces entry values') + '</span>'
+        : esc(f.value);
+      return '<tr><td>' + esc(f.name) + '</td><td>' + val + '</td><td><svg class="lexicon-icon"><use href="#folder"></use></svg>' + esc(f.origin) + '</td>' +
+        '<td><button class="btn btn--secondary btn--xs" type="button" data-override="' + f.id + '" aria-label="Override ' + esc(f.name) + '">Override</button></td></tr>';
     }).join('');
   }
 
@@ -372,7 +411,7 @@
       return '<div class="field-row"><div class="field-row__head"><span class="input__label">' + label + '</span>' + (extra || '') + '</div>' + html + '</div>';
     };
     var input = function (v, ro) { return '<input class="input__field" type="text" value="' + esc(v) + '"' + (ro ? ' readonly' : '') + '>'; };
-    var inh = function (from) { return '<span class="label label--sm label--success">Inherited from ' + esc(from) + '</span>'; };
+    var inh = function (from) { return '<span class="label label--sm label--success">Inherited from folder ' + esc(from) + '</span>'; };
     $('entryPath').textContent = 'Sun Care / Sunscreen / SPF 50+ / Sensitive skin / ' + folder;
     $('entryNotice').innerHTML = e.moved
       ? '<div class="alert alert--simple alert--info"><div class="alert__content"><svg class="lexicon-icon"><use href="#info-circle"></use></svg><p class="alert__text"><strong>Moved from Spray to Lotion.</strong> Format, Tags and Web Title (B2B) now follow Lotion. Your own values (Volume, Title Note and the tags you added) were kept.</p></div></div>'
@@ -384,7 +423,7 @@
       if (f.kind === 'list') {
         var mine = folder === 'Lotion' ? LOTION.tags : f.value;
         html += row(f.name, '<div class="multi-select">' + mine.concat(e.tags).map(function (v) { return '<span class="label label--sm">' + esc(v) + '</span>'; }).join('') + '<input class="multi-select__input" type="text" aria-label="Add tags"></div>' +
-          '<span class="input__help">' + esc(mine.join(', ')) + ' added by folder ' + folder + '. ' + esc(e.tags.join(', ')) + ' set on this entry.</span>');
+          '<span class="input__help">' + esc(mine.join(', ')) + ' added by folder ' + esc(folder === 'Lotion' ? 'Lotion' : sourceOf(f, folder)) + '. ' + esc(e.tags.join(', ')) + ' set on this entry.</span>');
       } else if (f.kind === 'composed' && f.mode === 'template') {
         var own = e.own[f.id];
         html += row(f.name, input(own || compose(tplFor(e, f), e), !own) +
@@ -394,7 +433,7 @@
       } else if (f.id === 'format') {
         html += row(f.name, input(fieldValue(e, 'format')), inh(folder));
       } else {
-        html += row(f.name, input(f.value), inh(f.origin || folder));
+        html += row(f.name, input(fieldValue(e, f.id)), inh(sourceOf(f, folder)));
       }
     });
     $('entryFields').innerHTML = html;
@@ -435,6 +474,11 @@
   document.addEventListener('input', function (ev) {
     var fid = ev.target.dataset && ev.target.dataset.tpl;
     if (fid) syncTemplate(fid);
+    var vid = ev.target.dataset && ev.target.dataset.val;
+    if (vid) {
+      byId(vid).value = ev.target.value;
+      fields.forEach(function (f) { if (f.mode === 'template' && $('prev-' + f.id)) $('prev-' + f.id).innerHTML = previewRows(f); });
+    }
   });
   document.addEventListener('keydown', function (ev) {
     if (ev.key === 'Enter' && ev.target.dataset && ev.target.dataset.tpl) ev.preventDefault();
@@ -454,6 +498,13 @@
     var d = t.dataset;
     if (d.rmToken !== undefined) {
       var ed = t.closest('[data-tpl]'); t.closest('[data-key]').remove(); syncTemplate(ed.dataset.tpl);
+    } else if (d.override) {
+      var of = byId(d.override);
+      of.overridden = true; of.inheritedValue = clone(of.value); renderFolder();
+      var fe = $('fld-' + of.id); if (fe) { fe.focus(); if (fe.select) fe.select(); }
+    } else if (d.inherit) {
+      var inf = byId(d.inherit);
+      inf.value = inf.inheritedValue; inf.overridden = false; renderFolder();
     } else if (d.mode) {
       var f = byId(d.fid);
       if (d.mode === 'template' && !f.parts) f.parts = [];
