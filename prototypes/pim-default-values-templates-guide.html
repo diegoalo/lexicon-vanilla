@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PIM Templates Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: single reading column with a sticky table of contents on desktop; each step = text + screenshot with caption */
+:root {
+  --bg: #f7f8fb;
+  --surface: #ffffff;
+  --fg: #1c2230;
+  --muted: #5b6475;
+  --line: #dde2ec;
+  --accent: #0b5fff;
+  --accent-soft: #e8efff;
+  --ok: #287d3c;
+  --ok-soft: #e9f5ec;
+  --warn: #a45200;
+  --warn-soft: #fff3e6;
+  --info: #2e5aac;
+  --chip-bg: #ffffff;
+  --font-body: "Public Sans", "Segoe UI", system-ui, sans-serif;
+  --font-ui: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --step: 1.0625rem;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12151c; --surface: #1a1f29; --fg: #e6e9f0; --muted: #a1a9b8; --line: #2d3442;
+    --accent: #6f9dff; --accent-soft: #1d2a45; --ok: #6cc784; --ok-soft: #183021; --warn: #f0a35a; --warn-soft: #3a2614;
+    --info: #8fb0f0; --chip-bg: #222836; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12151c; --surface: #1a1f29; --fg: #e6e9f0; --muted: #a1a9b8; --line: #2d3442;
+  --accent: #6f9dff; --accent-soft: #1d2a45; --ok: #6cc784; --ok-soft: #183021; --warn: #f0a35a; --warn-soft: #3a2614;
+  --info: #8fb0f0; --chip-bg: #222836; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: var(--step); line-height: 1.6; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 40px 80px; display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 56px; }
+@media (max-width: 900px) { .wrap { grid-template-columns: minmax(0, 1fr); gap: 24px; } .toc { position: static !important; } }
+h1, h2, h3 { text-wrap: balance; line-height: 1.25; margin: 0; }
+h1 { font-size: 2.1rem; font-weight: 700; letter-spacing: -0.01em; }
+h2 { font-size: 1.45rem; font-weight: 700; }
+h3 { font-size: 1.1rem; font-weight: 600; }
+p { margin: 0; }
+a { color: var(--accent); }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+
+.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 24px); align-self: start; font-size: 0.9rem; }
+.toc__label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 600; margin-bottom: 8px; }
+.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.toc a { display: flex; gap: 10px; padding: 5px 8px; border-radius: 6px; color: var(--fg); text-decoration: none; }
+.toc a:hover { background: var(--accent-soft); }
+.toc .n { color: var(--muted); font-variant-numeric: tabular-nums; min-width: 1.4em; }
+.toc .grp { margin-top: 12px; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 600; padding-left: 8px; }
+
+main { min-width: 0; display: grid; gap: 64px; }
+.intro { display: grid; gap: 18px; max-width: 70ch; }
+.eyebrow { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); font-weight: 700; }
+.lede { font-size: 1.15rem; color: var(--muted); }
+.cta { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 6px; background: var(--accent); color: #fff; font-weight: 600; text-decoration: none; font-size: 0.95rem; }
+.note { font-size: 0.9rem; color: var(--muted); }
+
+.box { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 20px 22px; display: grid; gap: 12px; }
+.box--idea { border-left: 4px solid var(--accent); }
+
+section { display: grid; gap: 18px; scroll-margin-top: 24px; }
+.sec-head { display: flex; gap: 14px; align-items: baseline; }
+.sec-num { font-family: var(--font-ui); font-size: 0.85rem; color: var(--accent); background: var(--accent-soft); border-radius: 999px; padding: 2px 10px; flex: none; }
+.text { display: grid; gap: 12px; max-width: 70ch; }
+.text ul, .text ol { margin: 0; padding-left: 1.3em; display: grid; gap: 6px; }
+
+figure { margin: 0; display: grid; gap: 8px; }
+figure img { display: block; max-width: 100%; height: auto; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+figure.narrow img { width: 240px; }
+figure.mid img { width: 460px; }
+figure.half img { width: 720px; }
+figcaption { font-size: 0.88rem; color: var(--muted); }
+.figs { display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start; }
+.figs > figure { min-width: 0; }
+
+/* Términos tal como aparecen en pantalla */
+.ui { font-family: var(--font-ui); font-size: 0.82em; background: var(--chip-bg); border: 1px solid var(--line); border-radius: 4px; padding: 1px 6px; white-space: nowrap; }
+.chip { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; border: 1px solid currentColor; border-radius: 4px; padding: 1px 6px; white-space: nowrap; }
+.chip--ok { color: var(--ok); background: var(--ok-soft); }
+.chip--info { color: var(--info); background: var(--accent-soft); }
+.chip--warn { color: var(--warn); background: var(--warn-soft); }
+.chip--plain { color: var(--muted); }
+
+.tree { font-family: var(--font-ui); font-size: 0.85rem; line-height: 1.8; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px 20px; overflow-x: auto; white-space: pre; }
+.tree b { color: var(--accent); font-weight: 500; }
+.tree i { color: var(--muted); font-style: normal; }
+
+.tbl { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 0.93rem; }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+tr:last-child td { border-bottom: 0; }
+
+.steps { counter-reset: s; list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+.steps li { counter-increment: s; display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 10px; }
+.steps li::before { content: counter(s); font-family: var(--font-ui); font-size: 0.8rem; width: 24px; height: 24px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; margin-top: 3px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="toc" aria-label="Contents">
+    <div class="toc__label">In this guide</div>
+    <ol>
+      <li><a href="#idea"><span class="n">·</span>The idea in 1 minute</a></li>
+      <li><a href="#example"><span class="n">·</span>The example</a></li>
+      <li><a href="#panel"><span class="n">0</span>Prototype panel</a></li>
+      <li class="grp">Folder</li>
+      <li><a href="#folder"><span class="n">1</span>Folder screen</a></li>
+      <li><a href="#inherited"><span class="n">2</span>Inherited and own</a></li>
+      <li><a href="#tags"><span class="n">3</span>List fields</a></li>
+      <li><a href="#template"><span class="n">4</span>A template</a></li>
+      <li><a href="#editing"><span class="n">5</span>Editing a template</a></li>
+      <li><a href="#guardrails"><span class="n">6</span>Help while typing</a></li>
+      <li><a href="#value"><span class="n">7</span>Value or Template</a></li>
+      <li><a href="#summary"><span class="n">8</span>Side summary</a></li>
+      <li class="grp">Product</li>
+      <li><a href="#product"><span class="n">9</span>Product screen</a></li>
+      <li><a href="#own"><span class="n">10</span>Writing your own</a></li>
+      <li class="grp">Sara's cases</li>
+      <li><a href="#seasonal"><span class="n">A</span>Seasonal rename</a></li>
+      <li><a href="#move"><span class="n">B</span>Moving a product</a></li>
+      <li class="grp">Wrap-up</li>
+      <li><a href="#glossary"><span class="n">·</span>Glossary</a></li>
+      <li><a href="#open"><span class="n">·</span>Open questions</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <header class="intro">
+      <span class="eyebrow">PIM · Default Values · Prototype</span>
+      <h1>Templates Instead of Prepend and Append</h1>
+      <p class="lede">A step-by-step guide to the prototype for someone opening it for the first time. Each step explains what you are looking at, what it means, and what you can try.</p>
+      <div class="cta">
+        <a class="btn" href="pim-default-values-templates.html">Open the prototype</a>
+        <span class="note">Labels from the prototype are quoted <span class="ui">like this</span>.</span>
+      </div>
+    </header>
+
+    <section id="idea" aria-labelledby="h-idea">
+      <h2 id="h-idea">The idea in 1 minute</h2>
+      <div class="text">
+        <p>In Andrea's prototype, a folder default value applies in one of three modes: <span class="ui">Override</span>, <span class="ui">Append</span>, or <span class="ui">Prepend</span>. The last two add text at the start or end of the product's value when it is published.</p>
+        <p>This prototype explores another way to get the same result:</p>
+        <ul>
+          <li><strong>Simple fields</strong> (SPF, Format...): the folder gives a value and the product inherits it. This is the usual Override.</li>
+          <li><strong>List fields</strong> (Tags): the folder can <em>add</em> its values to the product's values or <em>replace</em> them. This is the Append that makes sense.</li>
+          <li><strong>Composed fields</strong> (channel titles and descriptions): the folder defines a <strong>template</strong> that mixes fixed text with other fields. Each product sees its final result while it is being edited.</li>
+        </ul>
+      </div>
+      <div class="box box--idea">
+        <strong>Why a template instead of Prepend/Append</strong>
+        <p>With Prepend/Append, the product's Web Title only stores a fragment ("50 ml – Travel size"), and the full title only appears on publish, joined to the folder's text. With a template, the title is built from fields that already exist (Product Line, SPF, Format, Volume...) plus a <span class="ui">Title Note</span> field for the part that belongs only to the product. So the field shows the final title while you edit, no data is typed twice, and the folder can place each part wherever it wants.</p>
+      </div>
+      <p class="note">These are ideas to support the discussion, not a final proposal.</p>
+    </section>
+
+    <section id="example" aria-labelledby="h-example">
+      <h2 id="h-example">The example used in the prototype</h2>
+      <div class="text">
+        <p>It is the sunscreen case Sara shared. Folders go from general to specific, and each level adds one piece of data:</p>
+      </div>
+      <div class="tree" role="img" aria-label="Folder tree of the example">Sun Care
+└─ Sunscreen                 <i>→ Product Line = Sunscreen</i>
+   └─ SPF 50+                <i>→ SPF = SPF 50+</i>
+      └─ Sensitive skin      <i>→ Skin Type = Sensitive skin, Tags = Sun care, Sensitive skin</i>
+         ├─ <b>Spray</b>             <i>→ Format = Spray   ← the folder we edit</i>
+         │  ├─ SUN-SPF50-SENS-SPR-050   <i>50 ml, Title Note "Travel size"</i>
+         │  ├─ SUN-SPF50-SENS-SPR-150   <i>150 ml</i>
+         │  └─ SUN-SPF50-SENS-SPR-200   <i>200 ml, with its own Web Title</i>
+         └─ Lotion           <i>→ Format = Lotion   ← target of case B</i></div>
+      <div class="text"><p>The three Spray products are the ones you will see in the preview tables. The 200 ml one already has a hand-written title, to show what happens when a product does not follow the template.</p></div>
+    </section>
+
+    <section id="panel" aria-labelledby="h-panel">
+      <div class="sec-head"><span class="sec-num">0</span><h2 id="h-panel">The Prototype panel (bottom left)</h2></div>
+      <div class="figs">
+        <figure class="narrow"><img src="img/pim-templates-guide/08-panel-prototipo.png" alt="Prototype panel with a screen switch and case buttons"><figcaption>Not part of the product. It helps you move around the prototype.</figcaption></figure>
+        <div class="text" style="flex:1 1 320px">
+          <ul>
+            <li><span class="ui">Screen</span>: switches between the folder settings (<span class="ui">Folder settings</span>) and a product inside it (<span class="ui">Entry inside it</span>).</li>
+            <li><span class="ui">Try a case</span>: plays Sara's two cases in one click. They are covered at the end (cases A and B).</li>
+            <li><span class="ui">Start again</span>: reloads and resets everything.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="folder" aria-labelledby="h-folder">
+      <div class="sec-head"><span class="sec-num">1</span><h2 id="h-folder">The folder screen</h2></div>
+      <figure><img src="img/pim-templates-guide/01-pantalla-carpeta.png" alt="Folder Settings: Spray screen with the Default Values section"><figcaption>This is where the prototype opens: the settings of the Spray folder.</figcaption></figure>
+      <div class="text">
+        <ul>
+          <li><strong>Header</strong>: <span class="ui">Folder Settings: Spray</span>, with the path of parent folders below. <span class="ui">Save</span> saves and says how many products are updated.</li>
+          <li><strong>Left menu</strong>: <span class="ui">General</span> and <span class="ui">Default Values</span>. Only the second one is built.</li>
+          <li><strong>Center</strong>: the default values, in two groups. On top, <span class="ui">Inherited from Parent Folders</span> (what comes from the folders above). Below, <span class="ui">Set in This Folder</span> (what Spray sets). Steps 2 to 7 go through them.</li>
+          <li><strong>Right</strong>: a summary of the products in the folder and a short cheat sheet on how templates work (step 8).</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="inherited" aria-labelledby="h-inherited">
+      <div class="sec-head"><span class="sec-num">2</span><h2 id="h-inherited">What the folder inherits and what it sets</h2></div>
+      <div class="text">
+        <p>Fields (Product Line, SPF, Format...) belong to the product type: every product has them. Folders do not add fields; they only give <strong>default values</strong>. Each level sets one, and a child folder inherits the ones above it.</p>
+      </div>
+      <figure><img src="img/pim-templates-guide/03-heredados.png" alt="Inherited from Parent Folders table with Product Line, SPF, Skin Type and Tags"><figcaption><span class="ui">Inherited from Parent Folders</span>: which value arrives and from which folder. Read only.</figcaption></figure>
+      <figure><img src="img/pim-templates-guide/03b-puestos-aqui.png" alt="Set in This Folder group with Format = Spray"><figcaption><span class="ui">Set in This Folder</span>: what Spray adds on top. Here, <span class="ui">Format = Spray</span>, plus the templates in steps 4 to 7.</figcaption></figure>
+      <div class="text">
+        <p>In the example, each folder name matches the value it sets (the Sunscreen folder sets Product Line = Sunscreen), because that is how Sara's catalog is organized. The <span class="ui">Set in Folder</span> column always shows the folder name.</p>
+        <p><strong>Changing an inherited value for Spray only</strong>: click <span class="ui">Override</span> on its row. The field moves to the group below, editable, with the label <span class="chip chip--warn">Overrides folder SPF 50+</span>.</p>
+      </div>
+      <div class="figs">
+        <figure class="half"><img src="img/pim-templates-guide/03c-override-spf.png" alt="SPF overridden to SPF 30 with a Use Inherited button"><figcaption>SPF overridden to "SPF 30". <span class="ui">Use Inherited</span> brings back the value from above.</figcaption></figure>
+        <figure class="half"><img src="img/pim-templates-guide/03d-override-preview.png" alt="Web Title preview using SPF 30"><figcaption>The Web Title preview already uses "SPF 30" for the products that follow the template.</figcaption></figure>
+      </div>
+    </section>
+
+    <section id="tags" aria-labelledby="h-tags">
+      <div class="sec-head"><span class="sec-num">3</span><h2 id="h-tags">List fields: add or replace</h2></div>
+      <figure><img src="img/pim-templates-guide/04-tags.png" alt="Tags field with Applies as: Add to Entry Values or Replace"><figcaption>Tags is inherited from Sensitive skin. The table shows "Added to entry values"; after <span class="ui">Override</span>, the two <span class="ui">Applies as</span> options appear.</figcaption></figure>
+      <div class="text">
+        <ul>
+          <li><span class="ui">Add to Entry Values</span>: the folder's tags are <strong>added</strong> to the product's tags. A product with "Travel size" ends up with Sun care, Sensitive skin, and Travel size.</li>
+          <li><span class="ui">Replace</span>: the folder's tags <strong>replace</strong> the product's tags.</li>
+        </ul>
+        <p>This is the only place where "Append" makes sense: adding to a list is natural. In free text it is not.</p>
+      </div>
+    </section>
+
+    <section id="template" aria-labelledby="h-template">
+      <div class="sec-head"><span class="sec-num">4</span><h2 id="h-template">A field with a template: Web Title (B2B)</h2></div>
+      <figure><img src="img/pim-templates-guide/05-plantilla-web-title.png" alt="Web Title (B2B) field with its template and preview table"><figcaption>The heart of the prototype: the B2B channel title is built with a template.</figcaption></figure>
+      <div class="text">
+        <p>From top to bottom:</p>
+        <ol>
+          <li><span class="chip chip--info">Template</span> tells you this field uses a template.</li>
+          <li><span class="ui">Applies as</span> <span class="ui">Value</span> | <span class="ui">Template</span>: composed fields can give a fixed text or a template (step 7).</li>
+          <li><strong>The template box</strong>: each grey label (<span class="ui">PRODUCT LINE</span>, <span class="ui">SPF</span>...) is a field. When applied, it is replaced with that product's value. Anything between labels (the dashes) is plain text and stays as it is.</li>
+          <li><strong>Preview: what each product gets</strong>: one row per product with the title it gets. It updates live while you edit.</li>
+        </ol>
+        <p>Look at the table:</p>
+        <ul>
+          <li>The <strong>50 ml</strong> one ends with "Travel size": that is its <span class="ui">Title Note</span>.</li>
+          <li>The <strong>150 ml</strong> one has no Title Note, and its title ends cleanly at "150 ml" with no trailing dash. The prototype removes leftover separators when a field is empty.</li>
+          <li>The <strong>200 ml</strong> one shows <span class="chip chip--warn">Own value</span>: its title was written by hand, so the template does not affect it.</li>
+        </ul>
+      </div>
+      <figure><img src="img/pim-templates-guide/06-plantilla-descripcion.png" alt="Web Description (B2B) field with a Description template plus a fixed sentence"><figcaption>Another example: Web Description (B2B) uses the product's description and adds a fixed legal sentence. Before, this would be an Append, but here you see each product's result.</figcaption></figure>
+    </section>
+
+    <section id="editing" aria-labelledby="h-editing">
+      <div class="sec-head"><span class="sec-num">5</span><h2 id="h-editing">Editing the template</h2></div>
+      <figure><img src="img/pim-templates-guide/09-insertar-campo.png" alt="Insert Field menu open with the list of fields"><figcaption><span class="ui">Insert Field</span> opens the list of fields you can use.</figcaption></figure>
+      <div class="text">
+        <ul class="steps">
+          <li><span><strong>Type text</strong>: click anywhere in the box and type (for example, a separator or "Christmas Edition").</span></li>
+          <li><span><strong>Add a field</strong>: place the cursor where you want it, click <span class="ui">Insert Field</span>, and pick one. The label appears at the cursor.</span></li>
+          <li><span><strong>Remove a field</strong>: the <span class="ui">×</span> on each label removes it.</span></li>
+          <li><span><strong>Check</strong>: look at the preview table; it updates right away.</span></li>
+        </ul>
+        <p>Nobody has to learn a syntax like <code>{spf}</code>: the labels work like the Clay multiselect.</p>
+      </div>
+    </section>
+
+    <section id="guardrails" aria-labelledby="h-guardrails">
+      <div class="sec-head"><span class="sec-num">6</span><h2 id="h-guardrails">Help while you type</h2></div>
+      <figure><img src="img/pim-templates-guide/10-aviso-repetido.png" alt="Warning: SPF is used more than once, with the box in orange"><figcaption>Here SPF was added a second time at the end. The box turns orange and the table shows the effect.</figcaption></figure>
+      <div class="text">
+        <ul>
+          <li><strong>Repeated field</strong>: if you use the same field twice, you get <span class="ui">Warning: SPF is used more than once.</span> It is a warning, not an error: sometimes repeating is intended.</li>
+          <li><strong>Clean separators</strong>: if a field is empty for a product, no leftovers like "– –" or trailing dashes remain.</li>
+          <li><strong>One line</strong>: Enter does not add line breaks, and pasted content becomes plain text.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="value" aria-labelledby="h-value">
+      <div class="sec-head"><span class="sec-num">7</span><h2 id="h-value">Value or Template</h2></div>
+      <figure><img src="img/pim-templates-guide/11-modo-valor.png" alt="Web Title (B2B) in Value mode with a fixed text"><figcaption>With <span class="ui">Value</span>, the composed field becomes a fixed text, like a simple field.</figcaption></figure>
+      <div class="text">
+        <p>Only composed fields (channel titles and descriptions) have this switch. <span class="ui">Value</span> gives every product the same text, except the ones with their own. <span class="ui">Template</span> gives each product a different text, built from its own data.</p>
+      </div>
+    </section>
+
+    <section id="summary" aria-labelledby="h-summary">
+      <div class="sec-head"><span class="sec-num">8</span><h2 id="h-summary">The summary on the right</h2></div>
+      <div class="figs">
+        <figure class="narrow"><img src="img/pim-templates-guide/07-aside.png" alt="Inside this folder and How templates work blocks"><figcaption>Summary and cheat sheet.</figcaption></figure>
+        <div class="text" style="flex:1 1 320px">
+          <ul>
+            <li><span class="ui">Inside this folder</span>: how many products there are (3), how many follow all the folder values (2), and how many have their own Web Title (1, the 200 ml one).</li>
+            <li><span class="ui">How templates work</span>: the three rules in short. Labels are replaced with values, typed text stays the same, and the product sees the final result while editing. Nothing is added behind the scenes on publish.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="product" aria-labelledby="h-product">
+      <div class="sec-head"><span class="sec-num">9</span><h2 id="h-product">The product screen</h2></div>
+      <div class="text"><p>In the Prototype panel, choose <span class="ui">Entry inside it</span>. The 50 ml product opens as a catalog editor would see it.</p></div>
+      <figure><img src="img/pim-templates-guide/12-pantalla-producto.png" alt="Edit SUN-SPF50-SENS-SPR-050 screen"><figcaption>Editing product SUN-SPF50-SENS-SPR-050, inside Spray.</figcaption></figure>
+      <div class="text"><p>Fields fall into three kinds:</p></div>
+      <div class="figs">
+        <figure class="half"><img src="img/pim-templates-guide/13-producto-propios.png" alt="Own fields: Name, Volume, Title Note and Description"><figcaption><strong>Own fields</strong>: Name, Volume, <span class="ui">Title Note</span>, and Description. They belong to the product.</figcaption></figure>
+      </div>
+      <div class="text">
+        <p><span class="ui">Title Note</span> is the key to Sara's case: it is where the product writes "its" part of the title (an edition, a size, "digital"...). The folder template decides where it goes. Because it lives in its own field, it is never lost when the folder changes the template.</p>
+      </div>
+      <figure class="half"><img src="img/pim-templates-guide/14-producto-heredados.png" alt="Inherited fields with Inherited from folder labels"><figcaption><strong>Inherited fields</strong>: Product Line, SPF, Skin Type, and Format come from the folders. Tags shows the folder's tags and the product's tags together, with a note below on where each one comes from.</figcaption></figure>
+      <figure class="half"><img src="img/pim-templates-guide/15-producto-desde-plantilla.png" alt="Web Title (B2B) with a From template label and the template below"><figcaption><strong>Template fields</strong>: <span class="chip chip--info">From template</span> shows the final title already built and, below it, the template that builds it.</figcaption></figure>
+    </section>
+
+    <section id="own" aria-labelledby="h-own">
+      <div class="sec-head"><span class="sec-num">10</span><h2 id="h-own">Writing your own title (and going back)</h2></div>
+      <figure class="half"><img src="img/pim-templates-guide/16-producto-valor-propio.png" alt="Web Title (B2B) with an Own value label and a Use Template button"><figcaption>After <span class="ui">Write My Own</span>, the field becomes <span class="chip chip--warn">Own value</span>.</figcaption></figure>
+      <div class="text">
+        <ul class="steps">
+          <li><span><span class="ui">Write My Own</span>: the field becomes editable and stops following the template. It starts with the current text so you do not start from scratch.</span></li>
+          <li><span><span class="ui">Use Template</span>: drops the custom text, and the field follows the folder template again.</span></li>
+        </ul>
+        <p>It is the same pattern as the CMS permissions proposal: you either follow the folder or have your own, and you can always see which state you are in.</p>
+      </div>
+    </section>
+
+    <section id="seasonal" aria-labelledby="h-seasonal">
+      <div class="sec-head"><span class="sec-num">A</span><h2 id="h-seasonal">Sara's case: seasonal rename</h2></div>
+      <div class="text">
+        <p><strong>The question</strong>: for Christmas, I want every Spray title to start with "Christmas Edition". Do I have to edit product by product? Does each product lose what it had?</p>
+        <p><strong>How to try it</strong>: in the Prototype panel, click <span class="ui">Seasonal rename in Spray</span>.</p>
+      </div>
+      <figure class="mid"><img src="img/pim-templates-guide/19-toast.png" alt="Message: Spray template changed. 2 products updated, 1 keeps its own Web Title (B2B). Their Title Notes were kept."><figcaption>The message sums up the effect.</figcaption></figure>
+      <figure><img src="img/pim-templates-guide/18-caso-renombrar-detalle.png" alt="Template starting with Christmas Edition and the updated preview"><figcaption>The template now starts with "Christmas Edition –", and the preview already shows it.</figcaption></figure>
+      <div class="text">
+        <ul>
+          <li>One change in the folder updates the products that follow the template (050 and 150).</li>
+          <li>The 50 ml product keeps its "Travel size" because it lives in its <span class="ui">Title Note</span>, not glued to the title.</li>
+          <li>The 200 ml product does not change: it has its own title, and the message says so.</li>
+          <li>After Christmas, you remove the text from the template and everything goes back to how it was.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="move" aria-labelledby="h-move">
+      <div class="sec-head"><span class="sec-num">B</span><h2 id="h-move">Sara's case: moving a product to another folder</h2></div>
+      <div class="text">
+        <p><strong>The question</strong>: if a product moves to another folder, what happens to what it inherited and to what it wrote itself?</p>
+        <p><strong>How to try it</strong>: in the Prototype panel, click <span class="ui">Move 50 ml to Lotion</span>. The moved product opens.</p>
+      </div>
+      <figure><img src="img/pim-templates-guide/20-caso-mover.png" alt="50 ml product inside the Lotion folder"><figcaption>The path now ends in Lotion, and Format shows <span class="ui">Inherited from folder Lotion</span>.</figcaption></figure>
+      <figure class="half"><img src="img/pim-templates-guide/21-caso-mover-aviso.png" alt="Notice: Moved from Spray to Lotion"><figcaption>A notice explains what changed and what was kept.</figcaption></figure>
+      <figure class="half"><img src="img/pim-templates-guide/22-caso-mover-titulo.png" alt="Web Title (B2B) built by the Lotion template"><figcaption>The title is now built by the Lotion template: it says "Lotion" and keeps "Travel size".</figcaption></figure>
+      <div class="text">
+        <ul>
+          <li><strong>What changes</strong> is what comes from the folder: Format, the folder tags (Lotion adds "Body"), and the Web Title.</li>
+          <li><strong>What stays</strong> is the product's own data: Volume, Title Note, and the tags it added.</li>
+        </ul>
+        <p>Click <span class="ui">Start again</span> to go back to the initial state.</p>
+      </div>
+    </section>
+
+    <section id="glossary" aria-labelledby="h-glossary">
+      <h2 id="h-glossary">Glossary of what you see on screen</h2>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>On screen</th><th>Where</th><th>What it means</th></tr></thead>
+          <tbody>
+            <tr><td><span class="ui">Inherited from Parent Folders</span></td><td>Folder</td><td>Values that come from the folders above. Read only.</td></tr>
+            <tr><td><span class="ui">Set in This Folder</span></td><td>Folder</td><td>Values this folder sets.</td></tr>
+            <tr><td><span class="ui">Override</span> / <span class="ui">Use Inherited</span></td><td>Folder</td><td>Give an inherited field another value for this folder only, or go back to the inherited one.</td></tr>
+            <tr><td><span class="chip chip--warn">Overrides folder X</span></td><td>Folder</td><td>This folder changes the value that came from folder X.</td></tr>
+            <tr><td><span class="chip chip--ok">Inherited from folder X</span></td><td>Product</td><td>The value comes from folder X.</td></tr>
+            <tr><td><span class="ui">Applies as</span></td><td>Folder</td><td>How the value applies. Only for lists and composed fields.</td></tr>
+            <tr><td><span class="ui">Add to Entry Values</span> / <span class="ui">Replace</span></td><td>Folder, lists</td><td>Add the folder's tags to the product's tags, or replace them.</td></tr>
+            <tr><td><span class="ui">Value</span> / <span class="ui">Template</span></td><td>Folder, composed</td><td>The same fixed text for everyone, or a template with each product's data.</td></tr>
+            <tr><td><span class="chip chip--info">Template</span></td><td>Folder</td><td>This field uses a template.</td></tr>
+            <tr><td><span class="ui">Insert Field</span></td><td>Folder</td><td>Adds a field to the template at the cursor.</td></tr>
+            <tr><td><span class="ui">Preview: what each product gets</span></td><td>Folder</td><td>The template result for each product, live.</td></tr>
+            <tr><td><span class="chip chip--info">From template</span></td><td>Product</td><td>The value is built by the folder template.</td></tr>
+            <tr><td><span class="chip chip--warn">Own value</span></td><td>Both</td><td>The product has its own text. The template does not affect it.</td></tr>
+            <tr><td><span class="ui">Write My Own</span> / <span class="ui">Use Template</span></td><td>Product</td><td>Stop following the template, or follow it again.</td></tr>
+            <tr><td><span class="ui">Title Note</span></td><td>Product</td><td>The part of the title that belongs only to this product. The template decides where it goes.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="open" aria-labelledby="h-open">
+      <h2 id="h-open">Open questions</h2>
+      <div class="text">
+        <ul>
+          <li><strong>Live or only at creation</strong>: the prototype shows templates that keep updating products. For the PIM Beta, defaults applied at creation might be enough, with full inheritance later.</li>
+          <li><strong>Languages</strong>: one template per language, or a single one with translated fields?</li>
+          <li><strong>Several levels</strong>: if a parent folder and Spray both define a template for the same field, does the closest one win?</li>
+        </ul>
+        <p class="note">Reminder: these are ideas to help the conversation with PIM, not a decision.</p>
+      </div>
+    </section>
+  </main>
+</div>
+
+</body>
+</html>

@@ -80,6 +80,7 @@
     /* Prototype-only controls */
     .proto-panel { position: fixed; left: var(--spacing-7); bottom: var(--spacing-7); z-index: 1001; width: var(--proto-panel-w); box-shadow: var(--shadow-dropdown); }
     .proto-panel .popover__body { display: flex; flex-direction: column; gap: var(--spacing-3); }
+    .proto-panel a.btn { text-decoration: none; }
     .proto-panel__hint { font-size: var(--font-size-sm); color: var(--color-dark); opacity: 0.7; }
     .toast-host { position: fixed; right: var(--spacing-7); bottom: var(--spacing-7); z-index: 1100; max-width: calc(var(--spacing-10) * 9); }
     [hidden] { display: none !important; }
@@ -241,6 +242,8 @@
     <button class="btn btn--secondary btn--xs" type="button" data-case="rename">Seasonal rename in Spray</button>
     <button class="btn btn--secondary btn--xs" type="button" data-case="move">Move 50 ml to Lotion</button>
     <button class="btn btn--borderless btn--xs" type="button" data-case="reset">Start again</button>
+    <span class="proto-panel__hint">New here?</span>
+    <a class="btn btn--primary btn--xs" href="pim-default-values-templates-guide.html" target="_blank" rel="noopener"><svg class="lexicon-icon"><use href="#info-book"></use></svg> Step-by-Step Guide</a>
   </div>
 </aside>
 
