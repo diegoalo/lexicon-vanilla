@@ -26,7 +26,7 @@
     /* ── Same page skeleton as cms-unified-permissions.html (layout glue only, every value is a kit token) ── */
     :root { --proto-panel-w: calc(var(--spacing-10) * 4 + var(--spacing-5)); }
     :root { --page-nav-w: calc(var(--proto-panel-w) + var(--spacing-7) * 2); --page-aside-w: calc(var(--spacing-10) * 5 + var(--spacing-5)); }
-    .page { display: flex; flex-direction: column; min-height: calc(100vh - 60px); background: var(--color-white); }
+    .page { display: flex; flex-direction: column; min-height: 100vh; background: var(--color-white); }
     .page__header { display: flex; align-items: center; justify-content: space-between; gap: var(--spacing-5); flex-wrap: wrap; padding: var(--spacing-4) var(--spacing-7); border-bottom: 1px solid var(--color-secondary-l3); }
     .page__title-wrap { display: flex; align-items: center; gap: var(--spacing-4); min-width: 0; }
     .page__title-text { display: flex; flex-direction: column; gap: var(--spacing-1); min-width: 0; }
@@ -94,19 +94,6 @@
      (builds the value from other fields; covers Prepend and Append).
      List fields: add to the entry's values, or replace them.
      ═══════════════════════════════════════════════════════════════ -->
-
-<div class="control-menu">
-  <div class="control-menu__left">
-    <div class="control-menu__btns">
-      <button class="control-menu__btn" type="button" aria-label="Toggle product menu"><svg class="lexicon-icon"><use href="#product-menu-closed"></use></svg></button>
-    </div>
-    <span class="control-menu__title">Liferay PIM</span>
-  </div>
-  <div class="control-menu__right">
-    <button class="control-menu__btn" type="button" aria-label="Global navigation"><svg class="lexicon-icon"><use href="#grid"></use></svg></button>
-    <div class="control-menu__avatar"><img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=72&h=72&fit=crop&auto=format" alt="User avatar"></div>
-  </div>
-</div>
 
 <!-- ─── Folder settings: Spray ─────────────────────────────────── -->
 <div class="page" id="folderView">
